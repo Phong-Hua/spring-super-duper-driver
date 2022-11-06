@@ -239,7 +239,7 @@ class CloudStorageApplicationTests {
 	}
 	
 	/**
-	 * Login should faield for non registered user.
+	 * Login should failed for non registered user.
 	 */
 	@Test
 	public void shouldLoginFailedNonRegisteredUser() {
