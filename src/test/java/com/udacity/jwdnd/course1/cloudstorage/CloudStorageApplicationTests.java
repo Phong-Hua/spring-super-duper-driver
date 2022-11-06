@@ -247,4 +247,17 @@ class CloudStorageApplicationTests {
 		doLogIn("login03", "wrongpass");
 		Assertions.assertTrue(driver.findElement(By.id("error-msg")).getText().contains("Invalid username or password."));
 	}
+	
+	@Test
+	public void shouldLogoutSuccess() {
+		
+		doMockSignUp("logout01", "test", "logout01", "pass");
+		doLogIn("logout01", "pass");
+		
+		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+		WebElement logoutButton = driver.findElement(By.id("logout-button"));
+		logoutButton.click();
+		
+		webDriverWait.until(ExpectedConditions.titleContains("Login"));
+	}
 }
