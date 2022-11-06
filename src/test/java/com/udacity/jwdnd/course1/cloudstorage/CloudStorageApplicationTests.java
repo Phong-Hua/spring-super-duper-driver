@@ -110,8 +110,6 @@ class CloudStorageApplicationTests {
 		WebElement loginButton = driver.findElement(By.id("login-button"));
 		loginButton.click();
 
-		webDriverWait.until(ExpectedConditions.titleContains("Home"));
-
 	}
 
 	/**
@@ -177,6 +175,7 @@ class CloudStorageApplicationTests {
 		doLogIn("LFT", "123");
 
 		// Try to upload an arbitrary large file
+		
 		String fileName = "upload5m.zip";
 
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("fileUpload")));
@@ -218,5 +217,34 @@ class CloudStorageApplicationTests {
 		doMockSignUp(firstname, lastname, username, password);
 		
 		Assertions.assertTrue(driver.findElement(By.id("error-msg")).getText().contains("Username already exists."));
+	}
+	
+	@Test
+	public void shouldLoginSuccess() {
+		
+		doMockSignUp("login01", "test", "login01", "pass");
+		doLogIn("login01", "pass");
+		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+	}
+	
+	/**
+	 * Login should failed when user is registered but input wrong password.
+	 */
+	@Test
+	public void shouldLoginFailedWrongPassword() {
+		
+		doMockSignUp("login02", "test", "login02", "pass");
+		doLogIn("login02", "wrongpass");
+		Assertions.assertTrue(driver.findElement(By.id("error-msg")).getText().contains("Invalid username or password."));
+	}
+	
+	/**
+	 * Login should faield for non registered user.
+	 */
+	@Test
+	public void shouldLoginFailedNonRegisteredUser() {
+		
+		doLogIn("login03", "wrongpass");
+		Assertions.assertTrue(driver.findElement(By.id("error-msg")).getText().contains("Invalid username or password."));
 	}
 }
