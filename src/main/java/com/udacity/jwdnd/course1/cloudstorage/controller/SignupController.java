@@ -28,7 +28,6 @@ public class SignupController {
 	public String processSignupForm(User theUser, Model theModel) {
 		
 		String errorMsg = null;
-		
 		boolean usernameAvailable = userService.isUsernameAvailable(theUser.getUsername());
 		
 		if (usernameAvailable) {
@@ -41,7 +40,6 @@ public class SignupController {
 		} else {
 			errorMsg = "Username already exists.";
 		}
-		
 		if (errorMsg != null)
 			theModel.addAttribute("errorMsg", errorMsg);
 		

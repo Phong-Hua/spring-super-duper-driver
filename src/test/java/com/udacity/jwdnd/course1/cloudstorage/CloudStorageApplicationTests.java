@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CloudStorageApplicationTests {
 
@@ -50,16 +51,16 @@ class CloudStorageApplicationTests {
 	}
 
 	/**
-	 * PLEASE DO NOT DELETE THIS method.
-	 * Helper method for Udacity-supplied sanity checks.
+	 * PLEASE DO NOT DELETE THIS method. Helper method for Udacity-supplied sanity
+	 * checks.
 	 **/
-	private void doMockSignUp(String firstName, String lastName, String userName, String password){
+	private void doMockSignUp(String firstName, String lastName, String userName, String password) {
 		// Create a dummy account for logging in later.
 
 		// Visit the sign-up page.
 		driver.get("http://localhost:" + this.port + "/signup");
 		webDriverWait.until(ExpectedConditions.titleContains("Sign Up"));
-		
+
 		// Fill out credentials
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inputFirstName")));
 		WebElement inputFirstName = driver.findElement(By.id("inputFirstName"));
@@ -88,11 +89,10 @@ class CloudStorageApplicationTests {
 	}
 
 	/**
-	 * PLEASE DO NOT DELETE THIS method.
-	 * Helper method for Udacity-supplied sanity checks.
+	 * PLEASE DO NOT DELETE THIS method. Helper method for Udacity-supplied sanity
+	 * checks.
 	 **/
-	private void doLogIn(String userName, String password)
-	{
+	private void doLogIn(String userName, String password) {
 		// Log in to our dummy account.
 		driver.get("http://localhost:" + this.port + "/login");
 
@@ -113,69 +113,121 @@ class CloudStorageApplicationTests {
 	}
 
 	/**
-	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the 
-	 * rest of your code. 
-	 * This test is provided by Udacity to perform some basic sanity testing of 
-	 * your code to ensure that it meets certain rubric criteria. 
+	 * Click on note tab at home page
+	 */
+	private void doClickNoteTab() {
+		// click note tab
+		webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.id("nav-notes-tab")));
+		WebElement noteTab = driver.findElement(By.id("nav-notes-tab"));
+		noteTab.click();
+	}
+
+	/**
+	 * Click Note Tab and Add Note when at home page.
+	 */
+	private void doAddNoteAtHomePage(String noteTitle, String noteDescription) {
+		
+		doClickNoteTab();
+
+		// click add note button
+		webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.id("add-note-button")));
+		WebElement addNoteButton = driver.findElement(By.id("add-note-button"));
+		addNoteButton.click();
+
+		// wait for the form show up
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-note-form")));
+
+		doInputNoteTitleDescriptionThenSubmit(noteTitle, noteDescription);
+	}
+
+	private void doInputNoteTitleDescriptionThenSubmit(String noteTitle, String noteDescription) {
+		// Input title and description
+		WebElement inputNoteTitle = driver.findElement(By.id("input-note-title"));
+		inputNoteTitle.sendKeys(noteTitle);
+
+		WebElement inputNoteDescription = driver.findElement(By.id("input-note-description"));
+		inputNoteDescription.sendKeys(noteDescription);
+
+		// Click submit button
+
+		WebElement submitButton = driver.findElement(By.id("noteSubmit2"));
+		submitButton.click();
+	}
+
+	/**
+	 * When the result page display with the success. Click to home page.
+	 */
+	private void doClickHomeWhenResultSuccess() {
+//		// Verify success in result page
+		webDriverWait.until(ExpectedConditions.titleContains("Result"));
+		WebElement successHeading = driver.findElement(By.id("success"));
+		WebElement homeLink = driver.findElement(By.id("a-success"));
+		Assertions.assertTrue(successHeading.isDisplayed());
+		Assertions.assertTrue(homeLink.isDisplayed());
+
+		homeLink.click();
+	}
+
+	/**
+	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the
+	 * rest of your code. This test is provided by Udacity to perform some basic
+	 * sanity testing of your code to ensure that it meets certain rubric criteria.
 	 * 
-	 * If this test is failing, please ensure that you are handling redirecting users 
-	 * back to the login page after a succesful sign up.
-	 * Read more about the requirement in the rubric: 
-	 * https://review.udacity.com/#!/rubrics/2724/view 
+	 * If this test is failing, please ensure that you are handling redirecting
+	 * users back to the login page after a succesful sign up. Read more about the
+	 * requirement in the rubric: https://review.udacity.com/#!/rubrics/2724/view
 	 */
 	@Test
 	public void testRedirection() {
 		// Create a test account
-		doMockSignUp("Redirection","Test","RT","123");
-		
+		doMockSignUp("Redirection", "Test", "RT", "123");
+
 		// Check if we have been redirected to the log in page.
 		Assertions.assertEquals("http://localhost:" + this.port + "/login", driver.getCurrentUrl());
 	}
 
 	/**
-	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the 
-	 * rest of your code. 
-	 * This test is provided by Udacity to perform some basic sanity testing of 
-	 * your code to ensure that it meets certain rubric criteria. 
+	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the
+	 * rest of your code. This test is provided by Udacity to perform some basic
+	 * sanity testing of your code to ensure that it meets certain rubric criteria.
 	 * 
-	 * If this test is failing, please ensure that you are handling bad URLs 
+	 * If this test is failing, please ensure that you are handling bad URLs
 	 * gracefully, for example with a custom error page.
 	 * 
-	 * Read more about custom error pages at: 
+	 * Read more about custom error pages at:
 	 * https://attacomsian.com/blog/spring-boot-custom-error-page#displaying-custom-error-page
 	 */
 	@Test
 	public void testBadUrl() {
 		// Create a test account
-		doMockSignUp("URL","Test","UT","123");
+		doMockSignUp("URL", "Test", "UT", "123");
 		doLogIn("UT", "123");
-		
+
 		// Try to access a random made-up URL.
 		driver.get("http://localhost:" + this.port + "/some-random-page");
 		Assertions.assertFalse(driver.getPageSource().contains("Whitelabel Error Page"));
 	}
 
-
 	/**
-	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the 
-	 * rest of your code. 
-	 * This test is provided by Udacity to perform some basic sanity testing of 
-	 * your code to ensure that it meets certain rubric criteria. 
+	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the
+	 * rest of your code. This test is provided by Udacity to perform some basic
+	 * sanity testing of your code to ensure that it meets certain rubric criteria.
 	 * 
-	 * If this test is failing, please ensure that you are handling uploading large files (>1MB),
-	 * gracefully in your code. 
+	 * If this test is failing, please ensure that you are handling uploading large
+	 * files (>1MB), gracefully in your code.
 	 * 
-	 * Read more about file size limits here: 
-	 * https://spring.io/guides/gs/uploading-files/ under the "Tuning File Upload Limits" section.
+	 * Read more about file size limits here:
+	 * https://spring.io/guides/gs/uploading-files/ under the "Tuning File Upload
+	 * Limits" section.
 	 */
 	@Test
 	public void testLargeUpload() {
 		// Create a test account
-		doMockSignUp("Large File","Test","LFT","123");
+		doMockSignUp("Large File", "Test", "LFT", "123");
 		doLogIn("LFT", "123");
 
 		// Try to upload an arbitrary large file
-		
+
 		String fileName = "upload5m.zip";
 
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("fileUpload")));
@@ -196,68 +248,102 @@ class CloudStorageApplicationTests {
 	@Test
 	public void shouldSignupSuccess() {
 		doMockSignUp("John", "Smith", "jsmith", "pass");
-		
-		/* Check that the sign up was successful. 
-		// You may have to modify the element "success-msg" and the sign-up 
-		// success message below depening on the rest of your code.
-		*/
-		Assertions.assertTrue(driver.findElement(By.id("success-msg")).getText().contains("You successfully signed up!"));
+
+		/*
+		 * Check that the sign up was successful. // You may have to modify the element
+		 * "success-msg" and the sign-up // success message below depening on the rest
+		 * of your code.
+		 */
+		Assertions
+				.assertTrue(driver.findElement(By.id("success-msg")).getText().contains("You successfully signed up!"));
 	}
-	
+
 	@Test
 	public void shouldSignupFailedForDuplicateUsername() {
-		
+
 		String firstname = "Signup";
 		String lastname = "Failed";
-		String username ="sfDuplicated";
+		String username = "sfDuplicated";
 		String password = "pass";
-		
+
 		doMockSignUp(firstname, lastname, username, password);
-		
+
 		doMockSignUp(firstname, lastname, username, password);
-		
+
 		Assertions.assertTrue(driver.findElement(By.id("error-msg")).getText().contains("Username already exists."));
 	}
-	
+
 	@Test
 	public void shouldLoginSuccess() {
-		
+
 		doMockSignUp("login01", "test", "login01", "pass");
 		doLogIn("login01", "pass");
 		webDriverWait.until(ExpectedConditions.titleContains("Home"));
 	}
-	
+
 	/**
 	 * Login should failed when user is registered but input wrong password.
 	 */
 	@Test
 	public void shouldLoginFailedWrongPassword() {
-		
+
 		doMockSignUp("login02", "test", "login02", "pass");
 		doLogIn("login02", "wrongpass");
-		Assertions.assertTrue(driver.findElement(By.id("error-msg")).getText().contains("Invalid username or password."));
+		Assertions
+				.assertTrue(driver.findElement(By.id("error-msg")).getText().contains("Invalid username or password."));
 	}
-	
+
 	/**
 	 * Login should failed for non registered user.
 	 */
 	@Test
 	public void shouldLoginFailedNonRegisteredUser() {
-		
+
 		doLogIn("login03", "wrongpass");
-		Assertions.assertTrue(driver.findElement(By.id("error-msg")).getText().contains("Invalid username or password."));
+		Assertions
+				.assertTrue(driver.findElement(By.id("error-msg")).getText().contains("Invalid username or password."));
 	}
-	
+
 	@Test
 	public void shouldLogoutSuccess() {
-		
+
 		doMockSignUp("logout01", "test", "logout01", "pass");
 		doLogIn("logout01", "pass");
-		
+
 		webDriverWait.until(ExpectedConditions.titleContains("Home"));
 		WebElement logoutButton = driver.findElement(By.id("logout-button"));
 		logoutButton.click();
-		
+
 		webDriverWait.until(ExpectedConditions.titleContains("Login"));
+	}
+
+	@Test
+	public void shouldAddNoteSuccess() {
+
+		doMockSignUp("note01", "test", "note01", "pass");
+		doLogIn("note01", "pass");
+
+		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+
+		String title = "title01";
+		String description = "description01";
+
+		doAddNoteAtHomePage(title, description);
+
+//		// Verify success in result page
+		doClickHomeWhenResultSuccess();
+
+		// Verify the note display
+		doClickNoteTab();
+
+		webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.id("add-note-button")));
+		// Find the row that just added that contains the title01, we just added
+		WebElement newRow = driver.findElement(By.xpath("//table[@id='noteTable']//tbody//following::tr[th//text()[contains(., 'title01')]]"));
+
+		WebElement secondRowTitle = newRow.findElement(By.id("note-title"));
+		WebElement secondRowDescription = newRow.findElement(By.id("note-description"));
+
+		Assertions.assertTrue(secondRowTitle.getText().equals(title));
+		Assertions.assertTrue(secondRowDescription.getText().equals(description));
 	}
 }

@@ -32,9 +32,9 @@
 						Files 
 					</a> 
 					<a
-						class="nav-item nav-link" id="nav-notes-tab" data-toggle="tab"
-						href="#nav-notes" role="tab" aria-controls="nav-notes"
-						aria-selected="false"
+						class="nav-item nav-link" id="nav-notes-tab" 
+						data-toggle="tab" href="#nav-notes" role="tab" 
+						aria-controls="nav-notes" aria-selected="false"
 					> 
 						Notes 
 					</a> 
@@ -97,13 +97,14 @@
 				<div class="tab-pane fade" id="nav-notes" role="tabpanel"
 					aria-labelledby="nav-notes-tab">
 					<button style="margin: 0.25em;" type="button"
+						id="add-note-button"
 						class="btn btn-info float-right" onclick="showNoteModal()"
 					>
 						+ Add a New Note
 					</button>
 
 					<div class="table-responsive">
-						<table class="table table-striped" id="userTable">
+						<table class="table table-striped" id="noteTable">
 							<thead>
 								<tr>
 									<th style="width: 20%" scope="col"></th>
@@ -119,6 +120,14 @@
 									</td>
 									<th scope="row">Example Note Title</th>
 									<td>Example Note Description</td>
+								</tr>
+								<tr th:each="note: ${notes}">
+									<td th:id="'note-action-' + ${note.noteId}">
+										<button type="button" class="btn btn-success">Edit</button> 
+										<a class="btn btn-danger"> Delete </a>
+									</td>
+									<th id="note-title" scope="row" th:text="${note.noteTitle}"/>
+									<td id="note-description" th:text="${note.noteDescription}"/>
 								</tr>
 							</tbody>
 						</table>
@@ -137,22 +146,22 @@
 									</button>
 								</div>
 								<div class="modal-body">
-									<form action="#" method="POST">
-										<input type="hidden" name="noteId" id="note-id">
+									<form id="add-note-form" action="#" method="POST" th:action="@{/home/notes}">
+										<input th:if="${noteId}" type="hidden" name="noteId" id="note-id">
 										<div class="form-group">
 											<label for="note-title" class="col-form-label"
 											>
 												Title 
 											</label> 
 											<input type="text" name="noteTitle"
-												class="form-control" id="note-title" maxlength="20" required>
+												class="form-control" id="input-note-title" maxlength="20" required>
 										</div>
 										<div class="form-group">
 											<label for="note-description" class="col-form-label">
 												Description 
 											</label>
 											<textarea class="form-control" name="noteDescription"
-												id="note-description" rows="5" maxlength="1000" required>
+												id="input-note-description" rows="5" maxlength="1000" required>
 											</textarea>
 										</div>
 										<button id="noteSubmit" type="submit" class="d-none">
@@ -165,7 +174,7 @@
 									>
 										Close
 									</button>
-									<button type="button" class="btn btn-primary"
+									<button id="noteSubmit2" type="button" class="btn btn-primary"
 										onclick="$('#noteSubmit').click();"
 									>Save changes</button>
 								</div>
