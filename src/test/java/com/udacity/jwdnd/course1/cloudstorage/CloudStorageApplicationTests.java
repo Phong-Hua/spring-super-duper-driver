@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -109,7 +110,6 @@ class CloudStorageApplicationTests {
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("login-button")));
 		WebElement loginButton = driver.findElement(By.id("login-button"));
 		loginButton.click();
-
 	}
 
 	/**
@@ -362,8 +362,6 @@ class CloudStorageApplicationTests {
 		doMockSignUp("note02", "test", "note02", "pass");
 		doLogIn("note02", "pass");
 		
-		webDriverWait.until(ExpectedConditions.titleContains("Home"));
-		
 		String title = "title02";
 		String description = "description02";
 		
@@ -404,5 +402,93 @@ class CloudStorageApplicationTests {
 		Assertions.assertTrue(targetRow.findElement(By.id("note-description")).getText().equals(description));
 	}
 	
+	@Test
+	public void shouldDeleteNoteSuccess() {
+		
+		doMockSignUp("note03", "test", "note03", "pass");
+		doLogIn("note03", "pass");
+		
+		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+		
+		// Add new note
+		String title = "title03";
+		String description = "description03";
+		
+		doAddNoteAtHomePage(title, description);
+		
+		doClickHomeWhenResultSuccess();
+		
+		doClickNoteTab();
+		
+		// Find the row just added
+		WebElement targetRow = doFindRowWithHeaderContainsText(title);
+		
+		// Click on delete button
+		WebElement deleteButton = targetRow.findElement(By.id("delete-note-button"));
+		deleteButton.click();
+		
+		// Confirmation modal showup
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("delete-modal")));
+		WebElement deleteModal = driver.findElement(By.id("delete-modal"));
+		Assertions.assertTrue(deleteModal.isDisplayed());
+		
+		// Click on delete button
+		deleteButton = deleteModal.findElement(By.id("delete-button"));
+		deleteButton.click();
+		
+		// We are back to home page, click note tab
+		doClickNoteTab();
+		
+		// check the target row is not there
+		Assertions.assertThrows(NoSuchElementException.class, ()->{
+			doFindRowWithHeaderContainsText(title);
+		});
+	}
 	
+	/**
+	 * User click delete button on the note, then cancel delete.
+	 * The note should still be available
+	 */
+	@Test
+	public void shouldCancelDeleteNoteSuccess() {
+		
+		doMockSignUp("note04", "test", "note04", "pass");
+		doLogIn("note04", "pass");
+		
+		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+		
+		// Add new note
+		String title = "title04";
+		String description = "description04";
+		
+		doAddNoteAtHomePage(title, description);
+		
+		doClickHomeWhenResultSuccess();
+		
+		doClickNoteTab();
+		
+		// Find the row just added
+		WebElement targetRow = doFindRowWithHeaderContainsText(title);
+		
+		// Click on delete button
+		WebElement deleteButton = targetRow.findElement(By.id("delete-note-button"));
+		deleteButton.click();
+		
+		// Confirmation modal showup
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("delete-modal")));
+		WebElement deleteModal = driver.findElement(By.id("delete-modal"));
+		Assertions.assertTrue(deleteModal.isDisplayed());
+		
+		// Click on cancel button
+		WebElement cancelButton = deleteModal.findElement(By.id("cancel-button"));
+		cancelButton.click();
+		
+		// We are back to home page, click note tab
+		doClickNoteTab();
+		
+		// check the target row is not there
+		targetRow = doFindRowWithHeaderContainsText(title);
+		Assertions.assertTrue(targetRow.isDisplayed());
+
+	}
 }

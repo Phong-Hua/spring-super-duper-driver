@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.udacity.jwdnd.course1.cloudstorage.entity.CloudNote;
+import com.udacity.jwdnd.course1.cloudstorage.entity.DeleteItem;
 import com.udacity.jwdnd.course1.cloudstorage.services.NoteService;
 import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
 
@@ -49,5 +50,23 @@ public class HomeController {
 			theModel.addAttribute("error", "User is not authenticated.");
 		}
 		return "result";
+	}
+	
+	@PostMapping("/delete")
+	public String deleteItem(Authentication authentication, DeleteItem item, Model theModel) {
+		String error = null;
+		if (item.getItemType().equals("note")) {
+			int result = noteService.deleteNote(item.getItemId());
+			if (result == 0) {
+				error = "Note failed to be deleted. Try again.";
+			}
+		}
+		
+		if (error != null) {
+			theModel.addAttribute("error", error);
+			return "result";
+		}
+		
+		return "redirect:/home";
 	}
 }

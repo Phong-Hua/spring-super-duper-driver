@@ -13,12 +13,39 @@
 </head>
 <body class="p-3 mb-2 bg-light text-black">
 	<div class="container">
+		<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog"
+			aria-labelledby="noteModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="noteModalLabel">Delete</h5>
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<form action="#" method="POST" th:action="@{/home/delete}">
+							<input name="itemType" type="hidden" id="delete-item-type"/>
+							<input name="itemId" type="hidden" id="delete-item-id"/>
+							<p>Are you sure you want to delete this item?</p>
+							<button id="delete-submit" type="submit" class="d-none"></button>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button id="cancel-button" type="button" class="btn btn-secondary"
+							data-dismiss="modal">Cancel</button>
+						<button id="delete-button" type="button" class="btn btn-danger"
+							onclick="$('#delete-submit').click();">Delete</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<div id="logoutDiv">
 			<form action="#" method="POST" th:action="@{/logout}">
-				<button id="logout-button" type="submit" class="btn btn-secondary float-right"
-				>
-					Logout
-				</button>
+				<button id="logout-button" type="submit"
+					class="btn btn-secondary float-right">Logout</button>
 			</form>
 		</div>
 		<div id="contentDiv" style="clear: right;">
@@ -27,24 +54,13 @@
 				<div class="nav nav-tabs" id="nav-tab" role="tablist">
 					<a class="nav-item nav-link active" id="nav-files-tab"
 						data-toggle="tab" href="#nav-files" role="tab"
-						aria-controls="nav-files" aria-selected="true"
-					> 
-						Files 
-					</a> 
-					<a
-						class="nav-item nav-link" id="nav-notes-tab" 
-						data-toggle="tab" href="#nav-notes" role="tab" 
-						aria-controls="nav-notes" aria-selected="false"
-					> 
-						Notes 
-					</a> 
-					<a
-						class="nav-item nav-link" id="nav-credentials-tab"
-						data-toggle="tab" href="#nav-credentials" role="tab"
-						aria-controls="nav-credentials" aria-selected="false"
-					>
-						Credentials 
-					</a>
+						aria-controls="nav-files" aria-selected="true"> Files </a> <a
+						class="nav-item nav-link" id="nav-notes-tab" data-toggle="tab"
+						href="#nav-notes" role="tab" aria-controls="nav-notes"
+						aria-selected="false"> Notes </a> <a class="nav-item nav-link"
+						id="nav-credentials-tab" data-toggle="tab" href="#nav-credentials"
+						role="tab" aria-controls="nav-credentials" aria-selected="false">
+						Credentials </a>
 				</div>
 			</nav>
 
@@ -64,10 +80,8 @@
 										name="fileUpload">
 								</div>
 								<div class="col-sm-4">
-									<button type="submit" class="btn btn-dark" id="uploadButton"
-									>
-										Upload
-									</button>
+									<button type="submit" class="btn btn-dark" id="uploadButton">
+										Upload</button>
 								</div>
 							</div>
 						</div>
@@ -82,10 +96,8 @@
 							</thead>
 							<tbody>
 								<tr>
-									<td>
-										<a target="_blank" class="btn btn-success">View </a> 
-										<a class="btn btn-danger"> Delete </a>
-									</td>
+									<td><a target="_blank" class="btn btn-success">View </a> <a
+										class="btn btn-danger"> Delete </a></td>
 									<th scope="row">ExampleFile.txt</th>
 								</tr>
 							</tbody>
@@ -96,12 +108,9 @@
 				<!-- Note tab -->
 				<div class="tab-pane fade" id="nav-notes" role="tabpanel"
 					aria-labelledby="nav-notes-tab">
-					<button style="margin: 0.25em;" type="button"
-						id="add-note-button"
-						class="btn btn-info float-right" onclick="showNoteModal()"
-					>
-						+ Add a New Note
-					</button>
+					<button style="margin: 0.25em;" type="button" id="add-note-button"
+						class="btn btn-info float-right" onclick="showNoteModal()">
+						+ Add a New Note</button>
 
 					<div class="table-responsive">
 						<table class="table table-striped" id="noteTable">
@@ -116,24 +125,29 @@
 								<tr>
 									<td>
 										<button type="button" class="btn btn-success">Edit</button> 
-										<a class="btn btn-danger"> Delete </a>
+										<a class="btn btn-danger" > Delete
+									</a>
 									</td>
 									<th scope="row">Example Note Title</th>
 									<td>Example Note Description</td>
 								</tr>
 								<tr th:each="note: ${notes}">
 									<td th:id="'note-action-' + ${note.noteId}">
-										<button 
-											th:data-noteId="${note.noteId}"
+										<button th:data-noteId="${note.noteId}"
 											th:data-noteTitle="${note.noteTitle}"
 											th:data-noteDescription="${note.noteDescription}"
-											id="edit-note-button" type="button" 
-											class="btn btn-success" 
-											onclick="showNoteModal(this.getAttribute('data-noteId'), this.getAttribute('data-noteTitle'), this.getAttribute('data-noteDescription'))">Edit</button> 
-										<a class="btn btn-danger"> Delete </a>
+											id="edit-note-button" type="button" class="btn btn-success"
+											onclick="showNoteModal(this.getAttribute('data-noteId'), this.getAttribute('data-noteTitle'), this.getAttribute('data-noteDescription'))">Edit</button>
+										<a 
+											th:data-noteId="${note.noteId}"
+											class="btn btn-danger" id="delete-note-button" 
+											onclick="showDeleteModal(this.getAttribute('data-noteId'), 'note')"
+										> 
+											Delete
+										</a>
 									</td>
-									<th id="note-title" scope="row" th:text="${note.noteTitle}"/>
-									<td id="note-description" th:text="${note.noteDescription}"/>
+									<th id="note-title" scope="row" th:text="${note.noteTitle}" />
+									<td id="note-description" th:text="${note.noteDescription}" />
 								</tr>
 							</tbody>
 						</table>
@@ -144,31 +158,27 @@
 						<div class="modal-dialog" role="document">
 							<div class="modal-content">
 								<div class="modal-header">
-									<h5 class="modal-title" id="noteModalLabel">
-										Note</h5>
+									<h5 class="modal-title" id="noteModalLabel">Note</h5>
 									<button type="button" class="close" data-dismiss="modal"
 										aria-label="Close">
 										<span aria-hidden="true">&times;</span>
 									</button>
 								</div>
 								<div class="modal-body">
-									<form id="add-note-form" action="#" method="POST" 
+									<form id="add-note-form" action="#" method="POST"
 										th:action="@{/home/notes}">
 										<input type="hidden" name="noteId" id="note-id">
 										<div class="form-group">
-											<label for="note-title" class="col-form-label"
-											>
-												Title 
-											</label> 
-											<input type="text" name="noteTitle"
-												class="form-control" id="input-note-title" maxlength="20" required>
+											<label for="note-title" class="col-form-label"> Title
+											</label> <input type="text" name="noteTitle" class="form-control"
+												id="input-note-title" maxlength="20" required>
 										</div>
 										<div class="form-group">
 											<label for="note-description" class="col-form-label">
-												Description 
-											</label>
+												Description </label>
 											<textarea class="form-control" name="noteDescription"
-												id="input-note-description" rows="5" maxlength="1000" required>
+												id="input-note-description" rows="5" maxlength="1000"
+												required>
 											</textarea>
 										</div>
 										<button id="noteSubmit" type="submit" class="d-none">
@@ -177,13 +187,9 @@
 								</div>
 								<div class="modal-footer">
 									<button type="button" class="btn btn-secondary"
-										data-dismiss="modal"
-									>
-										Close
-									</button>
+										data-dismiss="modal">Close</button>
 									<button id="noteSubmit2" type="button" class="btn btn-primary"
-										onclick="$('#noteSubmit').click();"
-									>Save changes</button>
+										onclick="$('#noteSubmit').click();">Save changes</button>
 								</div>
 							</div>
 						</div>
@@ -194,10 +200,8 @@
 				<div class="tab-pane fade" id="nav-credentials" role="tabpanel"
 					aria-labelledby="nav-credentials-tab">
 					<button style="margin: 0.25em;" type="button"
-						class="btn btn-info float-right" onclick="showCredentialModal()"
-					>
-						+ Add a New Credential
-					</button>
+						class="btn btn-info float-right" onclick="showCredentialModal()">
+						+ Add a New Credential</button>
 
 					<div class="table-responsive">
 						<table class="table table-striped" th:object="${credentials}"
@@ -213,8 +217,8 @@
 							<tbody>
 								<tr>
 									<td>
-										<button type="button" class="btn btn-success">Edit</button> 
-										<a class="btn btn-danger">Delete</a>
+										<button type="button" class="btn btn-success">Edit</button> <a
+										class="btn btn-danger">Delete</a>
 									</td>
 									<th scope="row">Example Credential URL</th>
 									<td>Example Credential Username</td>
@@ -259,15 +263,10 @@
 								</div>
 								<div class="modal-footer">
 									<button type="button" class="btn btn-secondary"
-										data-dismiss="modal"
-									>
-										Close
-									</button>
+										data-dismiss="modal">Close</button>
 									<button type="button" class="btn btn-primary"
-										onclick="$('#credentialSubmit').click();"
-									>
-										Save changes
-									</button>
+										onclick="$('#credentialSubmit').click();">Save
+										changes</button>
 								</div>
 							</div>
 						</div>
@@ -287,7 +286,8 @@
 		function showNoteModal(noteId, noteTitle, noteDescription) {
 			$('#note-id').val(noteId ? noteId : '0');
 			$('#input-note-title').val(noteTitle ? noteTitle : '');
-			$('#input-note-description').val(noteDescription ? noteDescription : '');
+			$('#input-note-description').val(
+					noteDescription ? noteDescription : '');
 			$('#noteModal').modal('show');
 		}
 
@@ -298,6 +298,13 @@
 			$('#credential-username').val(username ? username : '');
 			$('#credential-password').val(password ? password : '');
 			$('#credentialModal').modal('show');
+		}
+
+		function showDeleteModal(itemId, type) {
+
+			$('#delete-item-id').val(itemId);
+			$('#delete-item-type').val(type);
+			$('#delete-modal').modal('show');
 		}
 	</script>
 </body>
