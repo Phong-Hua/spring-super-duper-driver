@@ -54,13 +54,20 @@
 				<div class="nav nav-tabs" id="nav-tab" role="tablist">
 					<a class="nav-item nav-link active" id="nav-files-tab"
 						data-toggle="tab" href="#nav-files" role="tab"
-						aria-controls="nav-files" aria-selected="true"> Files </a> <a
+						aria-controls="nav-files" aria-selected="true"> 
+						Files 
+					</a> 
+					<a
 						class="nav-item nav-link" id="nav-notes-tab" data-toggle="tab"
 						href="#nav-notes" role="tab" aria-controls="nav-notes"
-						aria-selected="false"> Notes </a> <a class="nav-item nav-link"
-						id="nav-credentials-tab" data-toggle="tab" href="#nav-credentials"
-						role="tab" aria-controls="nav-credentials" aria-selected="false">
-						Credentials </a>
+						aria-selected="false"> 
+						Notes 
+					</a> 
+					<a class="nav-item nav-link" id="nav-credentials-tab" data-toggle="tab" 
+						href="#nav-credentials" role="tab" aria-controls="nav-credentials" 
+						aria-selected="false">
+						Credentials 
+					</a>
 				</div>
 			</nav>
 
@@ -197,15 +204,15 @@
 				</div>
 
 				<!-- Credential tab -->
-				<div class="tab-pane fade" id="nav-credentials" role="tabpanel"
+				<div class="tab-pane fade" role="tabpanel" id="nav-credentials"
 					aria-labelledby="nav-credentials-tab">
-					<button style="margin: 0.25em;" type="button"
+					<button style="margin: 0.25em;" type="button" id="add-credential-button"
 						class="btn btn-info float-right" onclick="showCredentialModal()">
 						+ Add a New Credential</button>
 
 					<div class="table-responsive">
 						<table class="table table-striped" th:object="${credentials}"
-							id="credentialTable">
+							id="credential-table">
 							<thead>
 								<tr>
 									<th style="width: 20%" scope="col"></th>
@@ -217,12 +224,21 @@
 							<tbody>
 								<tr>
 									<td>
-										<button type="button" class="btn btn-success">Edit</button> <a
-										class="btn btn-danger">Delete</a>
+										<button type="button" class="btn btn-success">Edit</button> 
+										<a class="btn btn-danger">Delete</a>
 									</td>
 									<th scope="row">Example Credential URL</th>
 									<td>Example Credential Username</td>
 									<td>Example Credential Password</td>
+								</tr>
+								<tr th:each="credential: ${credentials}">
+									<td>
+										<button type="button" class="btn btn-success">Edit</button> 
+										<a class="btn btn-danger">Delete</a>
+									</td>
+									<th id="credential-url" th:text="${credential.url}" scope="row"/>
+									<td id="credential-username" th:text="${credential.username}" />
+									<td id="credential-password" th:text="${credential.password}"/>
 								</tr>
 							</tbody>
 						</table>
@@ -241,31 +257,31 @@
 									</button>
 								</div>
 								<div class="modal-body">
-									<form action="#" method="POST">
+									<form id="add-credential-form" action="#" method="POST" th:action="@{/home/credentials}">
 										<input type="hidden" name="credentialId" id="credential-id">
 										<div class="form-group">
 											<label for="credential-url" class="col-form-label">URL</label>
 											<input type="text" name="url" class="form-control"
-												id="credential-url" maxlength="100" required>
+												id="input-credential-url" maxlength="100" required>
 										</div>
 										<div class="form-group">
 											<label for="credential-username" class="col-form-label">Username</label>
 											<input type="text" name="username" class="form-control"
-												id="credential-username" maxlength="30" required>
+												id="input-credential-username" maxlength="30" required>
 										</div>
 										<div class="form-group">
 											<label for="credential-password" class="col-form-label">Password</label>
 											<input type="text" name="password" class="form-control"
-												id="credential-password" maxlength="30" required>
+												id="input-credential-password" maxlength="30" required>
 										</div>
-										<button id="credentialSubmit" type="submit" class="d-none"></button>
+										<button id="credential-submit" type="submit" class="d-none"></button>
 									</form>
 								</div>
 								<div class="modal-footer">
 									<button type="button" class="btn btn-secondary"
 										data-dismiss="modal">Close</button>
-									<button type="button" class="btn btn-primary"
-										onclick="$('#credentialSubmit').click();">Save
+									<button id="credential-submit-2" type="button" class="btn btn-primary"
+										onclick="$('#credential-submit').click();">Save
 										changes</button>
 								</div>
 							</div>
@@ -293,7 +309,7 @@
 
 		// For opening the credentials modal
 		function showCredentialModal(credentialId, url, username, password) {
-			$('#credential-id').val(credentialId ? credentialId : '');
+			$('#credential-id').val(credentialId ? credentialId : '0');
 			$('#credential-url').val(url ? url : '');
 			$('#credential-username').val(username ? username : '');
 			$('#credential-password').val(password ? password : '');

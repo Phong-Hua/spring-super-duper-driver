@@ -158,6 +158,60 @@ class CloudStorageApplicationTests {
 	}
 
 	/**
+	 * Click credential tab from home page
+	 */
+	private void doClickCredentialTab() {
+		
+		webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.id("nav-credentials-tab")));
+		WebElement credentialTab = driver.findElement(By.id("nav-credentials-tab"));
+		
+		credentialTab.click();
+		webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.id("add-credential-button")));
+	}
+	
+	/**
+	 * Assume the credential modal is open, Input credential then hit submit button.
+	 * @param url
+	 * @param username
+	 * @param password
+	 */
+	private void doInputCredentialThenSubmit(String url, String username, String password) {
+		// Input url, username, and password
+		WebElement urlElement = driver.findElement(By.id("input-credential-url"));
+		urlElement.clear();
+		urlElement.sendKeys(url);
+		
+		WebElement usernameElement = driver.findElement(By.id("input-credential-username"));
+		usernameElement.clear();
+		usernameElement.sendKeys(username);
+		
+		WebElement passwordElement = driver.findElement(By.id("input-credential-password"));
+		passwordElement.clear();
+		passwordElement.sendKeys(url);
+		
+		WebElement submitButton = driver.findElement(By.id("credential-submit-2"));
+		submitButton.click();
+	}
+	
+	/**
+	 * Click Note Tab and Add Note when at home page.
+	 */
+	private void doAddCredentialAtHomePage(String url, String username, String password) {
+		
+		doClickCredentialTab();
+
+		// click add note button
+		webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.id("add-credential-button")));
+		WebElement addCreButton = driver.findElement(By.id("add-credential-button"));
+		addCreButton.click();
+
+		// wait for the form show up
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-credential-form")));
+
+		doInputCredentialThenSubmit(url, username, password);
+	}
+	
+	/**
 	 * When the result page display with the success. Click to home page.
 	 */
 	private void doClickHomeWhenResultSuccess() {
@@ -174,6 +228,17 @@ class CloudStorageApplicationTests {
 	private WebElement doFindRowWithHeaderContainsText(String text) {
 		WebElement tbody = driver.findElement(By.xpath("//table[@id='noteTable']//tbody"));
 		WebElement targetRow =  tbody.findElement(By.xpath("//following::tr[th//text()[contains(., '" + text + "')]]"));
+		return targetRow;
+	}
+	
+	/**
+	 * Find the credential with url in the credential table.
+	 * @param url
+	 * @return
+	 */
+	private WebElement doFindRowCredentialContainsUrl(String url) {
+		WebElement tbody = driver.findElement(By.xpath("//table[@id='credential-table']//tbody"));
+		WebElement targetRow =  tbody.findElement(By.xpath("//following::tr[th//text()[contains(., '" + url + "')]]"));
 		return targetRow;
 	}
 	
@@ -489,6 +554,33 @@ class CloudStorageApplicationTests {
 		// check the target row is not there
 		targetRow = doFindRowWithHeaderContainsText(title);
 		Assertions.assertTrue(targetRow.isDisplayed());
-
+	}
+	
+	@Test
+	public void shouldAddCredentialSuccess() {
+		
+		doMockSignUp("credential01", "test", "credential01", "pass");
+		doLogIn("credential01", "pass");
+		
+		// Wait for home
+		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+		
+		// new credential
+		String url = "credential01.com";
+		String username = "credential01";
+		String password = "credential01pass";
+		
+		doAddCredentialAtHomePage(url, username, password);
+		
+		doClickHomeWhenResultSuccess();
+		
+		doClickCredentialTab();
+		
+		// Find the new row
+		WebElement targetRow = doFindRowCredentialContainsUrl(url);
+		
+		// Verify result
+		Assertions.assertTrue(targetRow.findElement(By.id("credential-url")).getText().equals(url));
+		Assertions.assertTrue(targetRow.findElement(By.id("credential-username")).getText().equals(username));
 	}
 }

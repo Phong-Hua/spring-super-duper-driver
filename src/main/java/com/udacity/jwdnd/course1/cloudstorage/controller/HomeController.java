@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.udacity.jwdnd.course1.cloudstorage.entity.CloudCredential;
 import com.udacity.jwdnd.course1.cloudstorage.entity.CloudNote;
 import com.udacity.jwdnd.course1.cloudstorage.entity.DeleteItem;
+import com.udacity.jwdnd.course1.cloudstorage.services.CredentialService;
 import com.udacity.jwdnd.course1.cloudstorage.services.NoteService;
 import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
 
@@ -20,17 +22,22 @@ public class HomeController {
 
 	private NoteService noteService;
 	private UserService userService;
+	private CredentialService credentialService;
 	
-	public HomeController(NoteService noteService, UserService userService) {
+	public HomeController(NoteService noteService, UserService userService, 
+			CredentialService credentialService) {
 		this.noteService = noteService;
 		this.userService = userService;
+		this.credentialService = credentialService;
 	}
 
 	@GetMapping
 	public String showHome(Authentication authentication, Model theModel) {
 		
 		List<CloudNote> notes = noteService.getNotes();
+		List<CloudCredential> credentials = credentialService.getCredentials();
 		theModel.addAttribute("notes", notes);
+		theModel.addAttribute("credentials", credentials);
 		return "home";
 	}
 	
@@ -68,5 +75,27 @@ public class HomeController {
 		}
 		
 		return "redirect:/home";
+	}
+	
+	@PostMapping("/credentials")
+	public String addCredential(Authentication authentication, CloudCredential credential, Model theModel) {
+		System.out.println("Credential: " + credential);
+		// get the user id
+		int userId = userService.getUserId(authentication.getName());
+		
+		if (userId > 0) {
+			credential.setUserId(userId);
+			int result = credentialService.addOrUpdateCredential(credential);
+			if (result <= 0) {
+				theModel.addAttribute("error", "Credential failed to added. Try again.");
+			} else {
+				theModel.addAttribute("success", "Credential is added successfully.");
+			}
+			
+		} else {
+			theModel.addAttribute("error", "User is not authenticated.");
+		}
+		
+		return "result";
 	}
 }
