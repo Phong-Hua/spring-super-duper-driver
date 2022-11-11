@@ -20,7 +20,11 @@ public class NoteService {
 		return noteMapper.getNotes();
 	}
 	
-	public int insertNote(CloudNote note) {
-		return noteMapper.insertNote(note);
+	public int addOrUpdate(CloudNote note) {
+		if (note.getNoteId() > 0) {
+			return noteMapper.updateNote(note);
+		} else {
+			return noteMapper.insertNote(note);
+		}
 	}
 }

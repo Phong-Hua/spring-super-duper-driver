@@ -120,6 +120,7 @@ class CloudStorageApplicationTests {
 		webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.id("nav-notes-tab")));
 		WebElement noteTab = driver.findElement(By.id("nav-notes-tab"));
 		noteTab.click();
+		webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.id("add-note-button")));
 	}
 
 	/**
@@ -143,9 +144,11 @@ class CloudStorageApplicationTests {
 	private void doInputNoteTitleDescriptionThenSubmit(String noteTitle, String noteDescription) {
 		// Input title and description
 		WebElement inputNoteTitle = driver.findElement(By.id("input-note-title"));
+		inputNoteTitle.clear();
 		inputNoteTitle.sendKeys(noteTitle);
 
 		WebElement inputNoteDescription = driver.findElement(By.id("input-note-description"));
+		inputNoteDescription.clear();
 		inputNoteDescription.sendKeys(noteDescription);
 
 		// Click submit button
@@ -168,6 +171,12 @@ class CloudStorageApplicationTests {
 		homeLink.click();
 	}
 
+	private WebElement doFindRowWithHeaderContainsText(String text) {
+		WebElement tbody = driver.findElement(By.xpath("//table[@id='noteTable']//tbody"));
+		WebElement targetRow =  tbody.findElement(By.xpath("//following::tr[th//text()[contains(., '" + text + "')]]"));
+		return targetRow;
+	}
+	
 	/**
 	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the
 	 * rest of your code. This test is provided by Udacity to perform some basic
@@ -346,4 +355,54 @@ class CloudStorageApplicationTests {
 		Assertions.assertTrue(secondRowTitle.getText().equals(title));
 		Assertions.assertTrue(secondRowDescription.getText().equals(description));
 	}
+	
+	@Test
+	public void shouldEditNoteSuccess() {
+		
+		doMockSignUp("note02", "test", "note02", "pass");
+		doLogIn("note02", "pass");
+		
+		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+		
+		String title = "title02";
+		String description = "description02";
+		
+		doAddNoteAtHomePage(title, description);
+		
+		doClickHomeWhenResultSuccess();
+		
+		doClickNoteTab();
+		
+		// Find the row just added
+		WebElement targetRow = doFindRowWithHeaderContainsText(title);
+		
+		// Click on the edit button
+		WebElement editButton = targetRow.findElement(By.id("edit-note-button"));
+		editButton.click();
+		
+		// wait for the form show up
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-note-form")));
+		
+		// edit the note
+		title = title + " edited";
+		description = description + " edited";
+		
+		doInputNoteTitleDescriptionThenSubmit(title, description);
+		doClickHomeWhenResultSuccess();
+		
+		// click note tab
+		doClickNoteTab();
+
+//		Thread.sleep(3000);
+		// Find the target row
+		targetRow = doFindRowWithHeaderContainsText(title);
+		Assertions.assertNotNull(targetRow);
+		
+		System.out.println("Target: " + targetRow.getText());
+		// Verify the title and description
+		Assertions.assertTrue(targetRow.findElement(By.id("note-title")).getText().equals(title));
+		Assertions.assertTrue(targetRow.findElement(By.id("note-description")).getText().equals(description));
+	}
+	
+	
 }

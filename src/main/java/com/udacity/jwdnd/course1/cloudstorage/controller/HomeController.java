@@ -35,10 +35,11 @@ public class HomeController {
 	
 	@PostMapping("/notes")
 	public String uploadNote(Authentication authentication, CloudNote note, Model theModel) {
+
 		int userId = userService.getUserId(authentication.getName());
 		if (userId > 0) {
 			note.setUserId(userId);
-			int noteId = noteService.insertNote(note);
+			int noteId = noteService.addOrUpdate(note);
 			if (noteId > 0) {
 				theModel.addAttribute("success", "Note is added successfully.");
 			} else {
