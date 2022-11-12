@@ -1,8 +1,11 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -139,5 +142,17 @@ public class HomeController {
 			theModel.addAttribute("error", "User is not authenticated.");
 		}
 		return "result";
+	}
+	
+	@GetMapping("/files")
+	public ResponseEntity getFile(@RequestParam("fileId") int fileId) throws FileNotFoundException {
+
+		CloudFile file = fileService.getFile(fileId);
+		if (file == null)
+			throw new FileNotFoundException();
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + 
+						file.getFileName() + "\"")
+				.body(file.getFileData());
 	}
 }

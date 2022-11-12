@@ -1,5 +1,7 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
+import java.io.FileNotFoundException;
+
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,6 +22,12 @@ public class CotrollerAdvice {
 	@ExceptionHandler(MaxUploadSizeExceededException.class)
 	public ModelAndView handleMaxSizeException(Model theModel, MaxUploadSizeExceededException exc) {
 		theModel.addAttribute("error", "Maximum upload size exceeded.");
+		return new ModelAndView(resultPage);
+	}
+	
+	@ExceptionHandler(FileNotFoundException.class)
+	public ModelAndView handleFileNotFoundException(Model theModel) {
+		theModel.addAttribute("error", "File does not exist.");
 		return new ModelAndView(resultPage);
 	}
 }

@@ -109,7 +109,7 @@
 								</tr>
 								<tr th:each="file : ${files}">
 									<td>
-										<a target="_blank" class="btn btn-success">View </a>
+										<a th:href="@{/home/files(fileId=${file.fileId})}" id="view-button" target="_blank" class="btn btn-success">View</a>
 										<a class="btn btn-danger"> Delete </a>
 									</td>
 									<th scope="row" th:text="${file.fileName}"/>

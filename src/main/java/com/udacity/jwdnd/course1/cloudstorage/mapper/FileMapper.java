@@ -18,4 +18,7 @@ public interface FileMapper {
 	@Insert("INSERT INTO FILES(filename, contenttype, filesize, filedata, userid) VALUES(#{fileName}, #{contentType}, #{fileSize}, #{fileData}, #{userId})")
 	@Options(useGeneratedKeys = true, keyProperty = "fileId")
 	int insertFile(CloudFile file);
+	
+	@Select("SELECT * FROM FILES WHERE fileId=#{fileId} LIMIT 1")
+	CloudFile getFile(int fileId);
 }

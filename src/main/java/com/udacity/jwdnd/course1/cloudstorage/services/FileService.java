@@ -23,4 +23,8 @@ public class FileService {
 	public int insertFile(CloudFile file) {
 		return fileMapper.insertFile(file); 
 	}
+	
+	public CloudFile getFile(int fileId) {
+		return fileMapper.getFile(fileId);
+	}
 }

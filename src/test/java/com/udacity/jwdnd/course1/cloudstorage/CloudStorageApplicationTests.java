@@ -1,6 +1,8 @@
 package com.udacity.jwdnd.course1.cloudstorage;
 
 import java.io.File;
+import java.nio.file.FileSystems;
+import java.time.Duration;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -9,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -246,12 +249,14 @@ class CloudStorageApplicationTests {
 
 	/**
 	 * Find a row of file table that has file name.
+	 * 
 	 * @param fileName
 	 * @return
 	 */
 	private WebElement doFindRowFileWithFilename(String fileName) {
 		WebElement tbody = driver.findElement(By.xpath("//table[@id='file-table']//tbody"));
-		WebElement targetRow = tbody.findElement(By.xpath("//following::tr[th//text()[contains(., '" + fileName + "')]]"));
+		WebElement targetRow = tbody
+				.findElement(By.xpath("//following::tr[th//text()[contains(., '" + fileName + "')]]"));
 		return targetRow;
 	}
 
@@ -266,7 +271,13 @@ class CloudStorageApplicationTests {
 		credentialTab.click();
 		webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.id("file-upload-button")));
 	}
-	
+
+	private void doWaitForFileDownloaded(File file, int timeoutSeconds) {
+		webDriverWait.withTimeout(Duration.ofSeconds(timeoutSeconds)).pollingEvery(Duration.ofMillis(500))
+				.ignoring(NoSuchElementException.class, StaleElementReferenceException.class);
+		webDriverWait.until((driver) -> file.exists());
+	}
+
 	/**
 	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the
 	 * rest of your code. This test is provided by Udacity to perform some basic
@@ -306,8 +317,6 @@ class CloudStorageApplicationTests {
 		driver.get("http://localhost:" + this.port + "/some-random-page");
 		Assertions.assertFalse(driver.getPageSource().contains("Whitelabel Error Page"));
 	}
-
-	
 
 	@Test
 	public void shouldSignupSuccess() {
@@ -724,7 +733,7 @@ class CloudStorageApplicationTests {
 
 		// Click on file tab
 		doClickFileTab();
-		
+
 		String fileName = "ExampleFileTest.txt";
 
 		WebElement fileSelectButton = driver.findElement(By.id("input-file"));
@@ -732,17 +741,17 @@ class CloudStorageApplicationTests {
 
 		WebElement uploadButton = driver.findElement(By.id("file-upload-button"));
 		uploadButton.click();
-		
+
 		doClickHomeWhenResultSuccess();
-		
+
 		// Click on file tab
 		doClickFileTab();
 
-		Assertions.assertDoesNotThrow(()->{
+		Assertions.assertDoesNotThrow(() -> {
 			doFindRowFileWithFilename(fileName);
 		});
 	}
-	
+
 	/**
 	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the
 	 * rest of your code. This test is provided by Udacity to perform some basic
@@ -763,10 +772,10 @@ class CloudStorageApplicationTests {
 
 		// Wait for home
 		webDriverWait.until(ExpectedConditions.titleContains("Home"));
-				
+
 		// Click on file tab
 		doClickFileTab();
-				
+
 		// Try to upload an arbitrary large file
 		String fileName = "upload5m.zip";
 
@@ -775,14 +784,90 @@ class CloudStorageApplicationTests {
 
 		WebElement uploadButton = driver.findElement(By.id("file-upload-button"));
 		uploadButton.click();
-		
+
 		doClickHomeWhenResultSuccess();
-		
+
 		// Click on file tab
 		doClickFileTab();
-		
-		Assertions.assertDoesNotThrow(()->{
+
+		Assertions.assertDoesNotThrow(() -> {
 			doFindRowFileWithFilename(fileName);
 		});
+	}
+
+	@Test
+	public void shouldDownloadFileSuccess() {
+
+		doMockSignUp("download01", "test", "download01", "pass");
+		doLogIn("download01", "pass");
+
+		// Wait for home
+		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+
+		// Click on file tab
+		doClickFileTab();
+
+		String fileName = "ExampleFileTest.txt";
+
+		WebElement fileSelectButton = driver.findElement(By.id("input-file"));
+		fileSelectButton.sendKeys(new File(fileName).getAbsolutePath());
+
+		WebElement uploadButton = driver.findElement(By.id("file-upload-button"));
+		uploadButton.click();
+
+		doClickHomeWhenResultSuccess();
+
+		// Click on file tab
+		doClickFileTab();
+
+		// Find the view button
+		WebElement targetRow = doFindRowFileWithFilename(fileName);
+		WebElement viewButton = targetRow.findElement(By.id("view-button"));
+
+		viewButton.click();
+
+		// Verify the file exist
+		String separator = FileSystems.getDefault().getSeparator();
+		File file = new File(System.getProperty("user.home") + separator + "Downloads" + separator + fileName);
+		
+		doWaitForFileDownloaded(file, 3);
+		Assertions.assertTrue(file.exists());
+	}
+
+	@Test
+	public void shouldDownloadLargeFileSuccess() {
+
+		doMockSignUp("download02", "test", "download02", "pass");
+		doLogIn("download02", "pass");
+
+		// Wait for home
+		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+
+		// Click on file tab
+		doClickFileTab();
+
+		String fileName = "upload5m.zip";
+
+		WebElement fileSelectButton = driver.findElement(By.id("input-file"));
+		fileSelectButton.sendKeys(new File(fileName).getAbsolutePath());
+
+		WebElement uploadButton = driver.findElement(By.id("file-upload-button"));
+		uploadButton.click();
+
+		doClickHomeWhenResultSuccess();
+
+		// Click on file tab
+		doClickFileTab();
+
+		// Find the view button
+		WebElement targetRow = doFindRowFileWithFilename(fileName);
+		WebElement viewButton = targetRow.findElement(By.id("view-button"));
+		viewButton.click();
+
+		// Verify the file exist
+		String separator = FileSystems.getDefault().getSeparator();
+		File file = new File(System.getProperty("user.home") + separator + "Downloads" + separator + fileName);
+		doWaitForFileDownloaded(file, 10);
+		Assertions.assertTrue(file.exists());
 	}
 }
