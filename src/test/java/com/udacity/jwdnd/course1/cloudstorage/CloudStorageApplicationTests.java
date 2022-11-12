@@ -244,12 +244,29 @@ class CloudStorageApplicationTests {
 		return targetRow;
 	}
 
-//	private WebElement doFindRowCredentialWithId(String url) {
-//		WebElement tbody = driver.findElement(By.xpath("//table[@id='credential-table']//tbody"));
-//		WebElement targetRow = tbody.findElement(By.xpath("//following::tr[th//text()[contains(., '" + url + "')]]"));
-//		return targetRow;
-//	}
+	/**
+	 * Find a row of file table that has file name.
+	 * @param fileName
+	 * @return
+	 */
+	private WebElement doFindRowFileWithFilename(String fileName) {
+		WebElement tbody = driver.findElement(By.xpath("//table[@id='file-table']//tbody"));
+		WebElement targetRow = tbody.findElement(By.xpath("//following::tr[th//text()[contains(., '" + fileName + "')]]"));
+		return targetRow;
+	}
 
+	/**
+	 * Click credential tab from home page
+	 */
+	private void doClickFileTab() {
+
+		webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.id("nav-files-tab")));
+		WebElement credentialTab = driver.findElement(By.id("nav-files-tab"));
+
+		credentialTab.click();
+		webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.id("file-upload-button")));
+	}
+	
 	/**
 	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the
 	 * rest of your code. This test is provided by Udacity to perform some basic
@@ -290,42 +307,7 @@ class CloudStorageApplicationTests {
 		Assertions.assertFalse(driver.getPageSource().contains("Whitelabel Error Page"));
 	}
 
-	/**
-	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the
-	 * rest of your code. This test is provided by Udacity to perform some basic
-	 * sanity testing of your code to ensure that it meets certain rubric criteria.
-	 * 
-	 * If this test is failing, please ensure that you are handling uploading large
-	 * files (>1MB), gracefully in your code.
-	 * 
-	 * Read more about file size limits here:
-	 * https://spring.io/guides/gs/uploading-files/ under the "Tuning File Upload
-	 * Limits" section.
-	 */
-	@Test
-	public void testLargeUpload() {
-		// Create a test account
-		doMockSignUp("Large File", "Test", "LFT", "123");
-		doLogIn("LFT", "123");
-
-		// Try to upload an arbitrary large file
-
-		String fileName = "upload5m.zip";
-
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("fileUpload")));
-		WebElement fileSelectButton = driver.findElement(By.id("fileUpload"));
-		fileSelectButton.sendKeys(new File(fileName).getAbsolutePath());
-
-		WebElement uploadButton = driver.findElement(By.id("uploadButton"));
-		uploadButton.click();
-		try {
-			webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id("success")));
-		} catch (org.openqa.selenium.TimeoutException e) {
-			System.out.println("Large File upload failed");
-		}
-		Assertions.assertFalse(driver.getPageSource().contains("HTTP Status 403 – Forbidden"));
-
-	}
+	
 
 	@Test
 	public void shouldSignupSuccess() {
@@ -679,16 +661,16 @@ class CloudStorageApplicationTests {
 		// Click on delete button
 		deleteButton = deleteModal.findElement(By.id("delete-button"));
 		deleteButton.click();
-		
+
 		// Click on the credential tab
 		doClickCredentialTab();
-		
+
 		// Verify the row is deleted
-		Assertions.assertThrows(NoSuchElementException.class, ()->{
+		Assertions.assertThrows(NoSuchElementException.class, () -> {
 			doFindRowCredentialContainsUrl(url);
 		});
 	}
-	
+
 	@Test
 	public void shouldCancelDeleteCredentialSuccess() {
 		doMockSignUp("credential04", "test", "credential04", "pass");
@@ -721,13 +703,86 @@ class CloudStorageApplicationTests {
 		// Click on delete button
 		WebElement cancelButton = deleteModal.findElement(By.id("cancel-button"));
 		cancelButton.click();
-		
+
 		// Click on the credential tab
 		doClickCredentialTab();
-		
+
 		// Verify the row is not deleted
-		Assertions.assertDoesNotThrow(()->{
+		Assertions.assertDoesNotThrow(() -> {
 			doFindRowCredentialContainsUrl(url);
+		});
+	}
+
+	@Test
+	public void shouldUploadSmallFileSuccess() throws InterruptedException {
+
+		doMockSignUp("upload01", "test", "upload01", "pass");
+		doLogIn("upload01", "pass");
+
+		// Wait for home
+		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+
+		// Click on file tab
+		doClickFileTab();
+		
+		String fileName = "ExampleFileTest.txt";
+
+		WebElement fileSelectButton = driver.findElement(By.id("input-file"));
+		fileSelectButton.sendKeys(new File(fileName).getAbsolutePath());
+
+		WebElement uploadButton = driver.findElement(By.id("file-upload-button"));
+		uploadButton.click();
+		
+		doClickHomeWhenResultSuccess();
+		
+		// Click on file tab
+		doClickFileTab();
+
+		Assertions.assertDoesNotThrow(()->{
+			doFindRowFileWithFilename(fileName);
+		});
+	}
+	
+	/**
+	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the
+	 * rest of your code. This test is provided by Udacity to perform some basic
+	 * sanity testing of your code to ensure that it meets certain rubric criteria.
+	 * 
+	 * If this test is failing, please ensure that you are handling uploading large
+	 * files (>1MB), gracefully in your code.
+	 * 
+	 * Read more about file size limits here:
+	 * https://spring.io/guides/gs/uploading-files/ under the "Tuning File Upload
+	 * Limits" section.
+	 */
+	@Test
+	public void testLargeUpload() {
+		// Create a test account
+		doMockSignUp("upload02", "test", "upload02", "pass");
+		doLogIn("upload02", "pass");
+
+		// Wait for home
+		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+				
+		// Click on file tab
+		doClickFileTab();
+				
+		// Try to upload an arbitrary large file
+		String fileName = "upload5m.zip";
+
+		WebElement fileSelectButton = driver.findElement(By.id("input-file"));
+		fileSelectButton.sendKeys(new File(fileName).getAbsolutePath());
+
+		WebElement uploadButton = driver.findElement(By.id("file-upload-button"));
+		uploadButton.click();
+		
+		doClickHomeWhenResultSuccess();
+		
+		// Click on file tab
+		doClickFileTab();
+		
+		Assertions.assertDoesNotThrow(()->{
+			doFindRowFileWithFilename(fileName);
 		});
 	}
 }
