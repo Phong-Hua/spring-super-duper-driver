@@ -110,7 +110,13 @@
 								<tr th:each="file : ${files}">
 									<td>
 										<a th:href="@{/home/files(fileId=${file.fileId})}" id="view-button" target="_blank" class="btn btn-success">View</a>
-										<a class="btn btn-danger"> Delete </a>
+										<a 
+											id="delete-file-button" class="btn btn-danger"
+											th:file-id="${file.fileId}"
+											onclick="showDeleteModal(this.getAttribute('file-id'), 'file')"
+										> 
+											Delete 
+										</a>
 									</td>
 									<th scope="row" th:text="${file.fileName}"/>
 								</tr>

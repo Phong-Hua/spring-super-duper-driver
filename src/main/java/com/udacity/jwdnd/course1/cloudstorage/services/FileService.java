@@ -27,4 +27,8 @@ public class FileService {
 	public CloudFile getFile(int fileId) {
 		return fileMapper.getFile(fileId);
 	}
+	
+	public int deleteFile(int fileId) {
+		return fileMapper.deleteFile(fileId);
+	}
 }

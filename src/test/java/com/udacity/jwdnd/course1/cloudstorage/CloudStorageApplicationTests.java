@@ -829,7 +829,7 @@ class CloudStorageApplicationTests {
 		// Verify the file exist
 		String separator = FileSystems.getDefault().getSeparator();
 		File file = new File(System.getProperty("user.home") + separator + "Downloads" + separator + fileName);
-		
+
 		doWaitForFileDownloaded(file, 3);
 		Assertions.assertTrue(file.exists());
 	}
@@ -869,5 +869,103 @@ class CloudStorageApplicationTests {
 		File file = new File(System.getProperty("user.home") + separator + "Downloads" + separator + fileName);
 		doWaitForFileDownloaded(file, 10);
 		Assertions.assertTrue(file.exists());
+	}
+
+	@Test
+	public void shouldDeleteFileSuccess() {
+
+		doMockSignUp("delete01", "test", "delete01", "pass");
+		doLogIn("delete01", "pass");
+
+		// Wait for home
+		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+
+		// Click on file tab
+		doClickFileTab();
+
+		String fileName = "upload5m.zip";
+
+		WebElement fileSelectButton = driver.findElement(By.id("input-file"));
+		fileSelectButton.sendKeys(new File(fileName).getAbsolutePath());
+
+		WebElement uploadButton = driver.findElement(By.id("file-upload-button"));
+		uploadButton.click();
+
+		doClickHomeWhenResultSuccess();
+
+		// Click on file tab
+		doClickFileTab();
+
+		// Find the view button
+		WebElement targetRow = doFindRowFileWithFilename(fileName);
+		WebElement deleteButton = targetRow.findElement(By.id("delete-file-button"));
+		deleteButton.click();
+
+		// Delete modal show up
+
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("delete-modal")));
+		WebElement deleteModal = driver.findElement(By.id("delete-modal"));
+		Assertions.assertTrue(deleteModal.isDisplayed());
+
+		// Click on delete button
+		deleteButton = deleteModal.findElement(By.id("delete-button"));
+		deleteButton.click();
+
+		// Click on File tab
+		doClickFileTab();
+		
+		// Verify the file is deleted
+		Assertions.assertThrows(NoSuchElementException.class, ()->{
+			doFindRowFileWithFilename(fileName);
+		});
+	}
+	
+	@Test
+	public void shouldCancelDeleteFileSuccess() {
+
+		doMockSignUp("delete02", "test", "delete02", "pass");
+		doLogIn("delete02", "pass");
+
+		// Wait for home
+		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+
+		// Click on file tab
+		doClickFileTab();
+
+		String fileName = "upload5m.zip";
+
+		WebElement fileSelectButton = driver.findElement(By.id("input-file"));
+		fileSelectButton.sendKeys(new File(fileName).getAbsolutePath());
+
+		WebElement uploadButton = driver.findElement(By.id("file-upload-button"));
+		uploadButton.click();
+
+		doClickHomeWhenResultSuccess();
+
+		// Click on file tab
+		doClickFileTab();
+
+		// Find the view button
+		WebElement targetRow = doFindRowFileWithFilename(fileName);
+		WebElement deleteButton = targetRow.findElement(By.id("delete-file-button"));
+		deleteButton.click();
+
+		// Delete modal show up
+
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("delete-modal")));
+		WebElement deleteModal = driver.findElement(By.id("delete-modal"));
+		Assertions.assertTrue(deleteModal.isDisplayed());
+
+		// Click on delete button
+		WebElement cancelButton = deleteModal.findElement(By.id("cancel-button"));
+		cancelButton.click();
+
+		// Click on File tab
+		doClickFileTab();
+		
+		// Verify the file is deleted
+		Assertions.assertDoesNotThrow(()->{
+			doFindRowFileWithFilename(fileName);
+		});
 	}
 }
