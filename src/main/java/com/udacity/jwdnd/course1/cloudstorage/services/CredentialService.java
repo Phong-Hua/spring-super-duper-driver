@@ -22,16 +22,27 @@ public class CredentialService {
 	}
 	
 	public List<CloudCredential> getCredentials() {
-		return credentialMapper.getCredentials();
+		List<CloudCredential> credentials = credentialMapper.getCredentials();
+		
+		for(CloudCredential cre : credentials) {
+			cre.setPlainPassword(encryptionService.decryptValue(cre.getEncryptedPassword(), 
+					cre.getEncodedKey()));
+		}
+		return credentials;
 	}
 	
 	public int addOrUpdateCredential(CloudCredential credential) {
-		String plainPassword = credential.getPassword();
+		String plainPassword = credential.getPlainPassword();
 		String encodedKey = generateEncodedKey();
 		String encryptedPassword = encryptionService.encryptValue(plainPassword, encodedKey);
-		credential.setPassword(encryptedPassword);
+		credential.setPlainPassword(null);
+		credential.setEncryptedPassword(encryptedPassword);
 		credential.setEncodedKey(encodedKey);
-		return credentialMapper.insertCredential(credential);
+		if (credential.getCredentialId() < 1) {
+			return credentialMapper.insertCredential(credential);
+		} else {
+			return credentialMapper.updateCredential(credential);
+		}
 	}
 	
 	private String generateEncodedKey() {

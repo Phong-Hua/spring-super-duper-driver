@@ -127,7 +127,7 @@ class CloudStorageApplicationTests {
 	 * Click Note Tab and Add Note when at home page.
 	 */
 	private void doAddNoteAtHomePage(String noteTitle, String noteDescription) {
-		
+
 		doClickNoteTab();
 
 		// click add note button
@@ -161,16 +161,17 @@ class CloudStorageApplicationTests {
 	 * Click credential tab from home page
 	 */
 	private void doClickCredentialTab() {
-		
+
 		webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.id("nav-credentials-tab")));
 		WebElement credentialTab = driver.findElement(By.id("nav-credentials-tab"));
-		
+
 		credentialTab.click();
 		webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.id("add-credential-button")));
 	}
-	
+
 	/**
 	 * Assume the credential modal is open, Input credential then hit submit button.
+	 * 
 	 * @param url
 	 * @param username
 	 * @param password
@@ -180,24 +181,24 @@ class CloudStorageApplicationTests {
 		WebElement urlElement = driver.findElement(By.id("input-credential-url"));
 		urlElement.clear();
 		urlElement.sendKeys(url);
-		
+
 		WebElement usernameElement = driver.findElement(By.id("input-credential-username"));
 		usernameElement.clear();
 		usernameElement.sendKeys(username);
-		
+
 		WebElement passwordElement = driver.findElement(By.id("input-credential-password"));
 		passwordElement.clear();
 		passwordElement.sendKeys(url);
-		
+
 		WebElement submitButton = driver.findElement(By.id("credential-submit-2"));
 		submitButton.click();
 	}
-	
+
 	/**
-	 * Click Note Tab and Add Note when at home page.
+	 * Click Credential Tab and Add Credential when at home page.
 	 */
 	private void doAddCredentialAtHomePage(String url, String username, String password) {
-		
+
 		doClickCredentialTab();
 
 		// click add note button
@@ -210,7 +211,7 @@ class CloudStorageApplicationTests {
 
 		doInputCredentialThenSubmit(url, username, password);
 	}
-	
+
 	/**
 	 * When the result page display with the success. Click to home page.
 	 */
@@ -227,20 +228,27 @@ class CloudStorageApplicationTests {
 
 	private WebElement doFindRowWithHeaderContainsText(String text) {
 		WebElement tbody = driver.findElement(By.xpath("//table[@id='noteTable']//tbody"));
-		WebElement targetRow =  tbody.findElement(By.xpath("//following::tr[th//text()[contains(., '" + text + "')]]"));
+		WebElement targetRow = tbody.findElement(By.xpath("//following::tr[th//text()[contains(., '" + text + "')]]"));
 		return targetRow;
 	}
-	
+
 	/**
 	 * Find the credential with url in the credential table.
+	 * 
 	 * @param url
 	 * @return
 	 */
 	private WebElement doFindRowCredentialContainsUrl(String url) {
 		WebElement tbody = driver.findElement(By.xpath("//table[@id='credential-table']//tbody"));
-		WebElement targetRow =  tbody.findElement(By.xpath("//following::tr[th//text()[contains(., '" + url + "')]]"));
+		WebElement targetRow = tbody.findElement(By.xpath("//following::tr[th//text()[contains(., '" + url + "')]]"));
 		return targetRow;
 	}
+
+//	private WebElement doFindRowCredentialWithId(String url) {
+//		WebElement tbody = driver.findElement(By.xpath("//table[@id='credential-table']//tbody"));
+//		WebElement targetRow = tbody.findElement(By.xpath("//following::tr[th//text()[contains(., '" + url + "')]]"));
+//		return targetRow;
+//	}
 	
 	/**
 	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the
@@ -412,7 +420,8 @@ class CloudStorageApplicationTests {
 
 		webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.id("add-note-button")));
 		// Find the row that just added that contains the title01, we just added
-		WebElement newRow = driver.findElement(By.xpath("//table[@id='noteTable']//tbody//following::tr[th//text()[contains(., 'title01')]]"));
+		WebElement newRow = driver.findElement(
+				By.xpath("//table[@id='noteTable']//tbody//following::tr[th//text()[contains(., 'title01')]]"));
 
 		WebElement secondRowTitle = newRow.findElement(By.id("note-title"));
 		WebElement secondRowDescription = newRow.findElement(By.id("note-description"));
@@ -420,39 +429,39 @@ class CloudStorageApplicationTests {
 		Assertions.assertTrue(secondRowTitle.getText().equals(title));
 		Assertions.assertTrue(secondRowDescription.getText().equals(description));
 	}
-	
+
 	@Test
 	public void shouldEditNoteSuccess() {
-		
+
 		doMockSignUp("note02", "test", "note02", "pass");
 		doLogIn("note02", "pass");
-		
+
 		String title = "title02";
 		String description = "description02";
-		
+
 		doAddNoteAtHomePage(title, description);
-		
+
 		doClickHomeWhenResultSuccess();
-		
+
 		doClickNoteTab();
-		
+
 		// Find the row just added
 		WebElement targetRow = doFindRowWithHeaderContainsText(title);
-		
+
 		// Click on the edit button
 		WebElement editButton = targetRow.findElement(By.id("edit-note-button"));
 		editButton.click();
-		
+
 		// wait for the form show up
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-note-form")));
-		
+
 		// edit the note
 		title = title + " edited";
 		description = description + " edited";
-		
+
 		doInputNoteTitleDescriptionThenSubmit(title, description);
 		doClickHomeWhenResultSuccess();
-		
+
 		// click note tab
 		doClickNoteTab();
 
@@ -460,127 +469,182 @@ class CloudStorageApplicationTests {
 		// Find the target row
 		targetRow = doFindRowWithHeaderContainsText(title);
 		Assertions.assertNotNull(targetRow);
-		
+
 		System.out.println("Target: " + targetRow.getText());
 		// Verify the title and description
 		Assertions.assertTrue(targetRow.findElement(By.id("note-title")).getText().equals(title));
 		Assertions.assertTrue(targetRow.findElement(By.id("note-description")).getText().equals(description));
 	}
-	
+
 	@Test
 	public void shouldDeleteNoteSuccess() {
-		
+
 		doMockSignUp("note03", "test", "note03", "pass");
 		doLogIn("note03", "pass");
-		
+
 		webDriverWait.until(ExpectedConditions.titleContains("Home"));
-		
+
 		// Add new note
 		String title = "title03";
 		String description = "description03";
-		
+
 		doAddNoteAtHomePage(title, description);
-		
+
 		doClickHomeWhenResultSuccess();
-		
+
 		doClickNoteTab();
-		
+
 		// Find the row just added
 		WebElement targetRow = doFindRowWithHeaderContainsText(title);
-		
+
 		// Click on delete button
 		WebElement deleteButton = targetRow.findElement(By.id("delete-note-button"));
 		deleteButton.click();
-		
+
 		// Confirmation modal showup
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("delete-modal")));
 		WebElement deleteModal = driver.findElement(By.id("delete-modal"));
 		Assertions.assertTrue(deleteModal.isDisplayed());
-		
+
 		// Click on delete button
 		deleteButton = deleteModal.findElement(By.id("delete-button"));
 		deleteButton.click();
-		
+
 		// We are back to home page, click note tab
 		doClickNoteTab();
-		
+
 		// check the target row is not there
-		Assertions.assertThrows(NoSuchElementException.class, ()->{
+		Assertions.assertThrows(NoSuchElementException.class, () -> {
 			doFindRowWithHeaderContainsText(title);
 		});
 	}
-	
+
 	/**
-	 * User click delete button on the note, then cancel delete.
-	 * The note should still be available
+	 * User click delete button on the note, then cancel delete. The note should
+	 * still be available
 	 */
 	@Test
 	public void shouldCancelDeleteNoteSuccess() {
-		
+
 		doMockSignUp("note04", "test", "note04", "pass");
 		doLogIn("note04", "pass");
-		
+
 		webDriverWait.until(ExpectedConditions.titleContains("Home"));
-		
+
 		// Add new note
 		String title = "title04";
 		String description = "description04";
-		
+
 		doAddNoteAtHomePage(title, description);
-		
+
 		doClickHomeWhenResultSuccess();
-		
+
 		doClickNoteTab();
-		
+
 		// Find the row just added
 		WebElement targetRow = doFindRowWithHeaderContainsText(title);
-		
+
 		// Click on delete button
 		WebElement deleteButton = targetRow.findElement(By.id("delete-note-button"));
 		deleteButton.click();
-		
+
 		// Confirmation modal showup
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("delete-modal")));
 		WebElement deleteModal = driver.findElement(By.id("delete-modal"));
 		Assertions.assertTrue(deleteModal.isDisplayed());
-		
+
 		// Click on cancel button
 		WebElement cancelButton = deleteModal.findElement(By.id("cancel-button"));
 		cancelButton.click();
-		
+
 		// We are back to home page, click note tab
 		doClickNoteTab();
-		
+
 		// check the target row is not there
 		targetRow = doFindRowWithHeaderContainsText(title);
 		Assertions.assertTrue(targetRow.isDisplayed());
 	}
-	
+
 	@Test
 	public void shouldAddCredentialSuccess() {
-		
+
 		doMockSignUp("credential01", "test", "credential01", "pass");
 		doLogIn("credential01", "pass");
-		
+
 		// Wait for home
 		webDriverWait.until(ExpectedConditions.titleContains("Home"));
-		
+
 		// new credential
 		String url = "credential01.com";
 		String username = "credential01";
 		String password = "credential01pass";
+
+		doAddCredentialAtHomePage(url, username, password);
+
+		doClickHomeWhenResultSuccess();
+
+		doClickCredentialTab();
+
+		// Find the new row
+		WebElement targetRow = doFindRowCredentialContainsUrl(url);
+
+		// Verify result
+		Assertions.assertTrue(targetRow.findElement(By.id("credential-url")).getText().equals(url));
+		Assertions.assertTrue(targetRow.findElement(By.id("credential-username")).getText().equals(username));
+	}
+
+	@Test
+	public void shouldEditCredentialSuccess() {
+
+		doMockSignUp("credential02", "test", "credential02", "pass");
+		doLogIn("credential02", "pass");
+
+		// Wait for home
+		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+
+		// new credential
+		String url = "credential02.com";
+		String username = "credential02";
+		String password = "credential02pass";
 		
 		doAddCredentialAtHomePage(url, username, password);
-		
 		doClickHomeWhenResultSuccess();
-		
 		doClickCredentialTab();
 		
 		// Find the new row
 		WebElement targetRow = doFindRowCredentialContainsUrl(url);
 		
+		// Find the edit button
+		WebElement editButton = targetRow.findElement(By.id("edit-credential-button"));
+		editButton.click();
+		
+		// wait for the form show up
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-credential-form")));
+
+		// new credential
+		String newUrl = "credential-after-02.com";
+		String newUsername = "credential-after-02";
+		String newPassword = "credential-after-02pass";
+		
+		doInputCredentialThenSubmit(newUrl, newUsername, newPassword);
+		doClickHomeWhenResultSuccess();
+		
+		// click on credential tab
+		doClickCredentialTab();
+		
+		// Wait until the credentials showup
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-credential-button")));
+		
 		// Verify result
-		Assertions.assertTrue(targetRow.findElement(By.id("credential-url")).getText().equals(url));
-		Assertions.assertTrue(targetRow.findElement(By.id("credential-username")).getText().equals(username));
+		// the old row does not appear
+		Assertions.assertThrows(NoSuchElementException.class,()->{
+			doFindRowCredentialContainsUrl(url);
+		});
+
+		targetRow = doFindRowCredentialContainsUrl(newUrl);
+		Assertions.assertTrue(targetRow.findElement(By.id("credential-username")).getText().equals(newUsername));
+		Assertions.assertTrue(targetRow.findElement(By.id("credential-url")).getText().equals(newUrl));
 	}
+	
+	
 }

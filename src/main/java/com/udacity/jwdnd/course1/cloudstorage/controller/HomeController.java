@@ -79,7 +79,7 @@ public class HomeController {
 	
 	@PostMapping("/credentials")
 	public String addCredential(Authentication authentication, CloudCredential credential, Model theModel) {
-		System.out.println("Credential: " + credential);
+
 		// get the user id
 		int userId = userService.getUserId(authentication.getName());
 		

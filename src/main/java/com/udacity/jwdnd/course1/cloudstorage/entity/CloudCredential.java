@@ -5,7 +5,8 @@ public class CloudCredential {
 	private int credentialId;
 	private String url;
 	private String username;
-	private String password;
+	private String encryptedPassword;
+	private String plainPassword;
 	private int userId;
 	private String encodedKey;
 	
@@ -15,7 +16,7 @@ public class CloudCredential {
 	public CloudCredential(String url, String username, String password, int userId) {
 		this.url = url;
 		this.username = username;
-		this.password = password;
+		this.plainPassword = password;
 		this.userId = userId;
 	}
 
@@ -42,13 +43,21 @@ public class CloudCredential {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-
-	public String getPassword() {
-		return password;
+	
+	public String getEncryptedPassword() {
+		return encryptedPassword;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setEncryptedPassword(String encryptedPassword) {
+		this.encryptedPassword = encryptedPassword;
+	}
+
+	public String getPlainPassword() {
+		return plainPassword;
+	}
+
+	public void setPlainPassword(String plainPassword) {
+		this.plainPassword = plainPassword;
 	}
 
 	public int getUserId() {
@@ -70,7 +79,8 @@ public class CloudCredential {
 	@Override
 	public String toString() {
 		return "CloudCredential [credentialId=" + credentialId + ", url=" + url + ", username=" + username
-				+ ", password=" + password + ", userId=" + userId + ", encodedKey=" + encodedKey + "]";
+				+ ", encryptedPassword=" + encryptedPassword + ", plainPassword=" + plainPassword + ", userId=" + userId
+				+ ", encodedKey=" + encodedKey + "]";
 	}
 }
 
