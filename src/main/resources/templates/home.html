@@ -244,7 +244,13 @@
 										>
 											Edit
 										</button> 
-										<a class="btn btn-danger">Delete</a>
+										<a 
+											th:data-credentialId="${credential.credentialId}"
+											class="btn btn-danger" id="delete-credential-button"
+											onclick="showDeleteModal(this.getAttribute('data-credentialId'), 'credential')"
+										>
+											Delete
+										</a>
 									</td>
 									
 									<th id="credential-url" th:text="${credential.url}" scope="row"/>

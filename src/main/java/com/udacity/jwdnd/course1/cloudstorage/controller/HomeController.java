@@ -67,6 +67,11 @@ public class HomeController {
 			if (result == 0) {
 				error = "Note failed to be deleted. Try again.";
 			}
+		} else if (item.getItemType().equals("credential")) {
+			int result = credentialService.deleteCredential(item.getItemId());
+			if (result == 0) {
+				error = "Note failed to be deleted. Try again.";
+			}
 		}
 		
 		if (error != null) {

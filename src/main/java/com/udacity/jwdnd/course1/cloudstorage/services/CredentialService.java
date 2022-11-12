@@ -45,6 +45,10 @@ public class CredentialService {
 		}
 	}
 	
+	public int deleteCredential(int credentialId) {
+		return credentialMapper.deleteCredential(credentialId);
+	}
+	
 	private String generateEncodedKey() {
 		SecureRandom random = new SecureRandom();
 		byte[] key = new byte[16];

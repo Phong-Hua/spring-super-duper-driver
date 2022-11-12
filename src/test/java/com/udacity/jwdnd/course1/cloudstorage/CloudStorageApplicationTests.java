@@ -249,7 +249,7 @@ class CloudStorageApplicationTests {
 //		WebElement targetRow = tbody.findElement(By.xpath("//following::tr[th//text()[contains(., '" + url + "')]]"));
 //		return targetRow;
 //	}
-	
+
 	/**
 	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the
 	 * rest of your code. This test is provided by Udacity to perform some basic
@@ -606,18 +606,18 @@ class CloudStorageApplicationTests {
 		String url = "credential02.com";
 		String username = "credential02";
 		String password = "credential02pass";
-		
+
 		doAddCredentialAtHomePage(url, username, password);
 		doClickHomeWhenResultSuccess();
 		doClickCredentialTab();
-		
+
 		// Find the new row
 		WebElement targetRow = doFindRowCredentialContainsUrl(url);
-		
+
 		// Find the edit button
 		WebElement editButton = targetRow.findElement(By.id("edit-credential-button"));
 		editButton.click();
-		
+
 		// wait for the form show up
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-credential-form")));
 
@@ -625,19 +625,19 @@ class CloudStorageApplicationTests {
 		String newUrl = "credential-after-02.com";
 		String newUsername = "credential-after-02";
 		String newPassword = "credential-after-02pass";
-		
+
 		doInputCredentialThenSubmit(newUrl, newUsername, newPassword);
 		doClickHomeWhenResultSuccess();
-		
+
 		// click on credential tab
 		doClickCredentialTab();
-		
+
 		// Wait until the credentials showup
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-credential-button")));
-		
+
 		// Verify result
 		// the old row does not appear
-		Assertions.assertThrows(NoSuchElementException.class,()->{
+		Assertions.assertThrows(NoSuchElementException.class, () -> {
 			doFindRowCredentialContainsUrl(url);
 		});
 
@@ -645,6 +645,89 @@ class CloudStorageApplicationTests {
 		Assertions.assertTrue(targetRow.findElement(By.id("credential-username")).getText().equals(newUsername));
 		Assertions.assertTrue(targetRow.findElement(By.id("credential-url")).getText().equals(newUrl));
 	}
+
+	@Test
+	public void shouldDeleteCredentialSuccess() {
+
+		doMockSignUp("credential03", "test", "credential03", "pass");
+		doLogIn("credential03", "pass");
+
+		// Wait for home
+		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+
+		// new credential
+		String url = "credential03.com";
+		String username = "credential03";
+		String password = "credential03pass";
+
+		doAddCredentialAtHomePage(url, username, password);
+		doClickHomeWhenResultSuccess();
+		doClickCredentialTab();
+
+		// Find the new row
+		WebElement targetRow = doFindRowCredentialContainsUrl(url);
+
+		// Find the edit button
+		WebElement deleteButton = targetRow.findElement(By.id("delete-credential-button"));
+		deleteButton.click();
+
+		// Confirmation modal showup
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("delete-modal")));
+		WebElement deleteModal = driver.findElement(By.id("delete-modal"));
+		Assertions.assertTrue(deleteModal.isDisplayed());
+
+		// Click on delete button
+		deleteButton = deleteModal.findElement(By.id("delete-button"));
+		deleteButton.click();
+		
+		// Click on the credential tab
+		doClickCredentialTab();
+		
+		// Verify the row is deleted
+		Assertions.assertThrows(NoSuchElementException.class, ()->{
+			doFindRowCredentialContainsUrl(url);
+		});
+	}
 	
-	
+	@Test
+	public void shouldCancelDeleteCredentialSuccess() {
+		doMockSignUp("credential04", "test", "credential04", "pass");
+		doLogIn("credential04", "pass");
+
+		// Wait for home
+		webDriverWait.until(ExpectedConditions.titleContains("Home"));
+
+		// new credential
+		String url = "credential04.com";
+		String username = "credential04";
+		String password = "credential04pass";
+
+		doAddCredentialAtHomePage(url, username, password);
+		doClickHomeWhenResultSuccess();
+		doClickCredentialTab();
+
+		// Find the new row
+		WebElement targetRow = doFindRowCredentialContainsUrl(url);
+
+		// Find the edit button
+		WebElement deleteButton = targetRow.findElement(By.id("delete-credential-button"));
+		deleteButton.click();
+
+		// Confirmation modal showup
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("delete-modal")));
+		WebElement deleteModal = driver.findElement(By.id("delete-modal"));
+		Assertions.assertTrue(deleteModal.isDisplayed());
+
+		// Click on delete button
+		WebElement cancelButton = deleteModal.findElement(By.id("cancel-button"));
+		cancelButton.click();
+		
+		// Click on the credential tab
+		doClickCredentialTab();
+		
+		// Verify the row is not deleted
+		Assertions.assertDoesNotThrow(()->{
+			doFindRowCredentialContainsUrl(url);
+		});
+	}
 }
