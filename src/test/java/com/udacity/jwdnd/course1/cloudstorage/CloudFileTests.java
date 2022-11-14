@@ -14,7 +14,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class CloudFileTests extends AbstractTests {
 
-
 	/**
 	 * Find a row of file table that has file name.
 	 * 
@@ -45,7 +44,7 @@ public class CloudFileTests extends AbstractTests {
 				.ignoring(NoSuchElementException.class, StaleElementReferenceException.class);
 		webDriverWait.until((driver) -> file.exists());
 	}
-	
+
 	/**
 	 * Hit the input file button, select the file then hit upload.
 	 */
@@ -56,31 +55,31 @@ public class CloudFileTests extends AbstractTests {
 		WebElement uploadButton = driver.findElement(By.id("file-upload-button"));
 		uploadButton.click();
 	}
-	
+
 	private void doUploadFileAtHomePage(String fileName) {
-		
+
 		doClickFileTab();
-		
+
 		doUploadFile(fileName);
 	}
-	
+
 	/**
-	 * Signup with username and password.
-	 * Login with username and password and upload the file.
-	 * The file must be available in the root.
+	 * Signup with username and password. Login with username and password and
+	 * upload the file. The file must be available in the root.
+	 * 
 	 * @param username
 	 * @param password
 	 * @param fileName
 	 */
 	private void doSignupLoginAndUploadFile(String username, String password, String fileName) {
-		
+
 		doMockSignUp("file", "test", username, password);
 		doLogIn(username, password);
 		doUploadFileAtHomePage(fileName);
 		doClickHomeWhenResultSuccess();
 		doClickFileTab();
 	}
-	
+
 	@Test
 	public void shouldUploadSmallFileSuccess() {
 
@@ -108,7 +107,7 @@ public class CloudFileTests extends AbstractTests {
 	 */
 	@Test
 	public void testLargeUpload() {
-		
+
 		String username = "file02", password = "pass";
 		String fileName = "upload5m.zip";
 
@@ -126,8 +125,7 @@ public class CloudFileTests extends AbstractTests {
 		String fileName = "ExampleFileTest.txt";
 
 		doSignupLoginAndUploadFile(username, password, fileName);
-		
-		
+
 		// Find the view button
 		WebElement targetRow = doFindRowFileWithFilename(fileName);
 		WebElement viewButton = targetRow.findElement(By.id("view-button"));
@@ -147,7 +145,7 @@ public class CloudFileTests extends AbstractTests {
 
 		String username = "file04", password = "pass";
 		String fileName = "upload5m.zip";
-		
+
 		doSignupLoginAndUploadFile(username, password, fileName);
 
 		// Find the view button
@@ -167,7 +165,7 @@ public class CloudFileTests extends AbstractTests {
 
 		String username = "file05", password = "pass";
 		String fileName = "upload5m.zip";
-		
+
 		doSignupLoginAndUploadFile(username, password, fileName);
 
 		// Find the view button
@@ -187,19 +185,19 @@ public class CloudFileTests extends AbstractTests {
 
 		// Click on File tab
 		doClickFileTab();
-		
+
 		// Verify the file is deleted
-		Assertions.assertThrows(NoSuchElementException.class, ()->{
+		Assertions.assertThrows(NoSuchElementException.class, () -> {
 			doFindRowFileWithFilename(fileName);
 		});
 	}
-	
+
 	@Test
 	public void shouldCancelDeleteFileSuccess() {
 
 		String username = "file06", password = "pass";
 		String fileName = "upload5m.zip";
-		
+
 		doSignupLoginAndUploadFile(username, password, fileName);
 
 		// Find the view button
@@ -219,10 +217,34 @@ public class CloudFileTests extends AbstractTests {
 
 		// Click on File tab
 		doClickFileTab();
-		
+
 		// Verify the file is deleted
-		Assertions.assertDoesNotThrow(()->{
+		Assertions.assertDoesNotThrow(() -> {
 			doFindRowFileWithFilename(fileName);
+		});
+	}
+
+	@Test
+	public void shouldUserOnlyDownloadTheirFiles() {
+
+		// create first user and upload file and logout
+		String username01 = "file07-01", password01 = "pass";
+		String fileName01 = "upload5m.zip";
+
+		doSignupLoginAndUploadFile(username01, password01, fileName01);
+		doClickLogoutAtHome();
+
+		// create second user and upload file and logout
+		String username02 = "file07-02", password02 = "pass";
+		String fileName02 = "ExampleFileTest.txt";
+
+		doSignupLoginAndUploadFile(username02, password02, fileName02);
+		doClickLogoutAtHome();
+		
+		// login as first user and we should not see second user file
+		doLogIn(username01, password01);
+		Assertions.assertThrows(NoSuchElementException.class, ()->{
+			doFindRowFileWithFilename(fileName02);
 		});
 	}
 }

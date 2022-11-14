@@ -44,9 +44,13 @@ public class HomeController {
 	@GetMapping
 	public String showHome(Authentication authentication, Model theModel) {
 		
-		List<CloudNote> notes = noteService.getNotes();
-		List<CloudCredential> credentials = credentialService.getCredentials();
-		List<CloudFile> files = fileService.getFiles();
+		// get the user id
+		int userId = userService.getUserId(authentication.getName());
+		
+		// get items relate to that users
+		List<CloudNote> notes = noteService.getNotes(userId);
+		List<CloudCredential> credentials = credentialService.getCredentials(userId);
+		List<CloudFile> files = fileService.getFiles(userId);
 
 		theModel.addAttribute("notes", notes);
 		theModel.addAttribute("credentials", credentials);
@@ -76,23 +80,28 @@ public class HomeController {
 	@PostMapping("/delete")
 	public String deleteItem(Authentication authentication, DeleteItem item, Model theModel) {
 		String error = null;
-		if (item.getItemType().equals("note")) {
-			int result = noteService.deleteNote(item.getItemId());
-			if (result == 0) {
-				error = "Note failed to be deleted. Try again.";
-			}
-		} else if (item.getItemType().equals("credential")) {
-			int result = credentialService.deleteCredential(item.getItemId());
-			if (result == 0) {
-				error = "Note failed to be deleted. Try again.";
-			}
-		} else if (item.getItemType().equals("file")) {
-			int result = fileService.deleteFile(item.getItemId());
-			if (result == 0) {
-				error = "File failed to be deleted. Try again.";
+		int userId = userService.getUserId(authentication.getName());
+		
+		if (userId <= 0) {
+			error = "User is not authenticated.";
+		} else {
+			if (item.getItemType().equals("note")) {
+				int result = noteService.deleteNote(item.getItemId(), userId);
+				if (result == 0) {
+					error = "Note failed to be deleted. Try again.";
+				}
+			} else if (item.getItemType().equals("credential")) {
+				int result = credentialService.deleteCredential(item.getItemId(), userId);
+				if (result == 0) {
+					error = "Note failed to be deleted. Try again.";
+				}
+			} else if (item.getItemType().equals("file")) {
+				int result = fileService.deleteFile(item.getItemId(), userId);
+				if (result == 0) {
+					error = "File failed to be deleted. Try again.";
+				}
 			}
 		}
-		
 		if (error != null) {
 			theModel.addAttribute("error", error);
 			return "result";
@@ -150,9 +159,10 @@ public class HomeController {
 	}
 	
 	@GetMapping("/files")
-	public ResponseEntity getFile(@RequestParam("fileId") int fileId) throws FileNotFoundException {
-
-		CloudFile file = fileService.getFile(fileId);
+	public ResponseEntity getFile(@RequestParam("fileId") int fileId, Authentication authentication) throws FileNotFoundException {
+		
+		int userId = userService.getUserId(authentication.getName());
+		CloudFile file = fileService.getFile(fileId, userId);
 		if (file == null)
 			throw new FileNotFoundException();
 		return ResponseEntity.ok()

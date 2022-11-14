@@ -16,8 +16,8 @@ public class NoteService {
 		this.noteMapper = noteMapper;
 	}
 	
-	public List<CloudNote> getNotes() {
-		return noteMapper.getNotes();
+	public List<CloudNote> getNotes(int userId) {
+		return noteMapper.getNotes(userId);
 	}
 	
 	public int addOrUpdate(CloudNote note) {
@@ -28,7 +28,7 @@ public class NoteService {
 		}
 	}
 	
-	public int deleteNote(int noteId) {
-		return noteMapper.deleteNote(noteId);
+	public int deleteNote(int noteId, int userId) {
+		return noteMapper.deleteNote(noteId, userId);
 	}
 }

@@ -21,8 +21,8 @@ public class CredentialService {
 		this.encryptionService = encryptionService;
 	}
 	
-	public List<CloudCredential> getCredentials() {
-		List<CloudCredential> credentials = credentialMapper.getCredentials();
+	public List<CloudCredential> getCredentials(int userId) {
+		List<CloudCredential> credentials = credentialMapper.getCredentials(userId);
 		
 		for(CloudCredential cre : credentials) {
 			cre.setPlainPassword(encryptionService.decryptValue(cre.getEncryptedPassword(), 
@@ -45,8 +45,8 @@ public class CredentialService {
 		}
 	}
 	
-	public int deleteCredential(int credentialId) {
-		return credentialMapper.deleteCredential(credentialId);
+	public int deleteCredential(int credentialId, int userId) {
+		return credentialMapper.deleteCredential(credentialId, userId);
 	}
 	
 	private String generateEncodedKey() {

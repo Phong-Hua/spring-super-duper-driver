@@ -13,16 +13,16 @@ import com.udacity.jwdnd.course1.cloudstorage.entity.CloudFile;
 @Mapper
 public interface FileMapper {
 
-	@Select("SELECT * FROM FILES")
-	List<CloudFile> getFiles();
+	@Select("SELECT * FROM FILES WHERE userid=#{userId}")
+	List<CloudFile> getFiles(int userId);
 	
 	@Insert("INSERT INTO FILES(filename, contenttype, filesize, filedata, userid) VALUES(#{fileName}, #{contentType}, #{fileSize}, #{fileData}, #{userId})")
 	@Options(useGeneratedKeys = true, keyProperty = "fileId")
 	int insertFile(CloudFile file);
 	
-	@Select("SELECT * FROM FILES WHERE fileId=#{fileId} LIMIT 1")
-	CloudFile getFile(int fileId);
+	@Select("SELECT * FROM FILES WHERE fileId=#{fileId} AND userid=#{userId} LIMIT 1")
+	CloudFile getFile(int fileId, int userId);
 	
-	@Delete("DELETE FROM FILES WHERE fileId=#{fileId}")
-	int deleteFile(int fileId);
+	@Delete("DELETE FROM FILES WHERE fileId=#{fileId} AND userid=#{userId}")
+	int deleteFile(int fileId, int userId);
 }

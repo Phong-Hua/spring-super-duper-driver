@@ -209,4 +209,31 @@ public class CloudNoteTests extends AbstractTests {
 		targetRow = doFindRowWithHeaderContainsText(title);
 		Assertions.assertTrue(targetRow.isDisplayed());
 	}
+	
+	@Test
+	public void shouldUserOnlySeeTheirNotes() {
+		
+		/**
+		 * Create 2 users with note and logout
+		 */
+		String username01 = "note05-01", password01 = "pass";
+		String title01 = "title05-01", description01 = "description05-01";
+
+		doSignupLoginAndAddNote(username01, password01, title01, description01);
+		doClickLogoutAtHome();
+		
+		String username02 = "note05-02", password02 = "pass";
+		String title02 = "title05-02", description02 = "description05-02";
+
+		doSignupLoginAndAddNote(username02, password02, title02, description02);
+		doClickLogoutAtHome();
+		
+		/**
+		 * Login as user 1, and we should not see user 2 notes
+		 */
+		doLogIn(username01, password01);
+		Assertions.assertThrows(NoSuchElementException.class, ()->{
+			doFindRowWithHeaderContainsText(title02);
+		});
+	}
 }

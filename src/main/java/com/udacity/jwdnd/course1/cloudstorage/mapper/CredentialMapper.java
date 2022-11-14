@@ -16,19 +16,19 @@ import com.udacity.jwdnd.course1.cloudstorage.entity.CloudCredential;
 @Mapper
 public interface CredentialMapper {
 
-	@Select("SELECT * FROM CREDENTIALS")
+	@Select("SELECT * FROM CREDENTIALS WHERE userid=#{userId}")
 	@Results({
 		@Result(property = "encryptedPassword", column = "password")
 	})	// mapped the column 'password' to 'encryptedPassword' property in CloudCredential
-	List<CloudCredential> getCredentials();
+	List<CloudCredential> getCredentials(int userId);
 	
 	@Insert("INSERT INTO CREDENTIALS(url, encodedkey, username, password, userid) VALUES(#{url}, #{encodedKey}, #{username}, #{encryptedPassword}, #{userId})")
 	@Options(useGeneratedKeys = true, keyProperty = "credentialId")
 	int insertCredential(CloudCredential credential);
 	
-	@Update("UPDATE CREDENTIALS SET url=#{url}, encodedKey=#{encodedKey}, username=#{username}, password=#{encryptedPassword} WHERE credentialid=#{credentialId}")
+	@Update("UPDATE CREDENTIALS SET url=#{url}, encodedKey=#{encodedKey}, username=#{username}, password=#{encryptedPassword} WHERE credentialid=#{credentialId} AND userid=#{userId}")
 	int updateCredential(CloudCredential credential);
 	
-	@Delete("DELETE FROM CREDENTIALS WHERE credentialid=#{credentialId}")
-	int deleteCredential(int credentialId);
+	@Delete("DELETE FROM CREDENTIALS WHERE credentialid=#{credentialId} AND userid=#{userId}")
+	int deleteCredential(int credentialId, int userId);
 }

@@ -229,4 +229,29 @@ public class CloudCredentialTests extends AbstractTests {
 			doFindRowCredentialContainsUrl(creUrl);
 		});
 	}
+	
+	@Test
+	public void shouldUserOnlySeeTheirCredential() {
+		
+		// Create first user then logout
+		String username01 = "credential05-01", password01 = "pass";
+		String creUrl01 = "credential05-01.com", creUsername01 = "credential05-01", crePassword01 = "credential05-01pass";
+		
+		doSignupLoginAndAddCredential(username01, password01, creUrl01, creUsername01, crePassword01);
+		doClickLogoutAtHome();
+		
+		// create second user then logout
+		String username02 = "credential05-02", password02 = "pass";
+		String creUrl02 = "credential05-02.com", creUsername02 = "credential05-02", crePassword02 = "credential05-02pass";
+		
+		doSignupLoginAndAddCredential(username02, password02, creUrl02, creUsername02, crePassword02);
+		doClickLogoutAtHome();
+		
+		// login as first user, and we should not see user 2 credentials
+		doLogIn(username01, password01);
+		
+		Assertions.assertThrows(NoSuchElementException.class, ()->{
+			doFindRowCredentialContainsUrl(creUrl02);
+		});
+	}
 }

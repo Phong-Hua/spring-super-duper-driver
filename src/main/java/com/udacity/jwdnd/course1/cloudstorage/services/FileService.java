@@ -16,19 +16,19 @@ public class FileService {
 		this.fileMapper = fileMapper;
 	}
 	
-	public List<CloudFile> getFiles() {
-		return fileMapper.getFiles();
+	public List<CloudFile> getFiles(int userId) {
+		return fileMapper.getFiles(userId);
 	}
 	
 	public int insertFile(CloudFile file) {
 		return fileMapper.insertFile(file); 
 	}
 	
-	public CloudFile getFile(int fileId) {
-		return fileMapper.getFile(fileId);
+	public CloudFile getFile(int fileId, int userId) {
+		return fileMapper.getFile(fileId, userId);
 	}
 	
-	public int deleteFile(int fileId) {
-		return fileMapper.deleteFile(fileId);
+	public int deleteFile(int fileId, int userId) {
+		return fileMapper.deleteFile(fileId, userId);
 	}
 }
