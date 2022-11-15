@@ -108,8 +108,6 @@ public class SecurityTests extends AbstractTests {
 
 		// Try to access a random made-up URL.
 		driver.get("http://localhost:" + this.port + "/some-random-page");
-		Assertions.assertFalse(driver.getPageSource().contains("Whitelabel Error Page"));
+		Assertions.assertTrue(driver.getPageSource().contains("The page you requested is not found."));
 	}
-
-	
 }
