@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.udacity.jwdnd.course1.cloudstorage.entity.User;
 import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
@@ -25,7 +26,7 @@ public class SignupController {
 	}
 	
 	@PostMapping
-	public String processSignupForm(User theUser, Model theModel) {
+	public String processSignupForm(User theUser, Model theModel, RedirectAttributes ra) {
 		
 		String errorMsg = null;
 		boolean usernameAvailable = userService.isUsernameAvailable(theUser.getUsername());
@@ -35,14 +36,17 @@ public class SignupController {
 			if (id <= 0) {
 				errorMsg = "An error has happened. Try again.";
 			} else {
-				theModel.addAttribute("signupSuccess", true);
+				// We add FlashAttribute to RedirectAttribute so the the message can be display in login
+				ra.addFlashAttribute("signupSuccess", true);
 			}
 		} else {
 			errorMsg = "Username already exists.";
 		}
-		if (errorMsg != null)
+		if (errorMsg != null) {
 			theModel.addAttribute("errorMsg", errorMsg);
-		
-		return "signup";
+			return "signup";
+		} else {
+			return "redirect:/login";
+		}
 	}
 }

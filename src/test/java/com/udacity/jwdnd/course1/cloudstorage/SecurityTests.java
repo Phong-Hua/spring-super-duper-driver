@@ -14,19 +14,6 @@ public class SecurityTests extends AbstractTests {
 	}
 	
 	@Test
-	public void shouldSignupSuccess() {
-		doMockSignUp("John", "Smith", "jsmith", "pass");
-
-		/*
-		 * Check that the sign up was successful. // You may have to modify the element
-		 * "success-msg" and the sign-up // success message below depening on the rest
-		 * of your code.
-		 */
-		Assertions
-				.assertTrue(driver.findElement(By.id("success-msg")).getText().contains("You successfully signed up!"));
-	}
-	
-	@Test
 	public void shouldSignupFailedForDuplicateUsername() {
 
 		String firstname = "Signup";
@@ -98,6 +85,8 @@ public class SecurityTests extends AbstractTests {
 
 		// Check if we have been redirected to the log in page.
 		Assertions.assertEquals("http://localhost:" + this.port + "/login", driver.getCurrentUrl());
+		
+		Assertions.assertTrue(driver.findElement(By.id("signup-success")).getText().contains("You successfully signed up!"));
 	}
 
 	/**
